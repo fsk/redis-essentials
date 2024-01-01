@@ -1,0 +1,16 @@
+{
+  "name": "second-example",
+  "version": "1.0.0",
+  "description": "upvote app",
+  "main": "main.js",
+  "scripts": {
+    "start": "main.js"
+  },
+  "type": "module",
+  "author": "FSK",
+  "license": "ISC",
+  "dependencies": {
+    "nodemon": "^3.0.2",
+    "redis": "^4.6.12"
+  }
+}
