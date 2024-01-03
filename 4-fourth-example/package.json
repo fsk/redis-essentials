@@ -1,0 +1,15 @@
+{
+  "name": "4-fourth-example",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "FSK",
+  "type": "module",
+  "license": "ISC",
+  "dependencies": {
+    "redis": "^4.6.12"
+  }
+}
