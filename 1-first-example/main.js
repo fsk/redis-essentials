@@ -9,3 +9,7 @@ await client.set('first_key', 'Redis Essentials');
 const value = await client.get('first_key');
 console.log(value);
 client.quit()
+
+/**
+ * /users/fsk/Documents/utils/redis-7.2.23/src/redis-cli
+ */

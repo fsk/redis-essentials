@@ -13,8 +13,10 @@ Queue.prototype.push = function (data) {
     return this.redisClient.lPush(this.queueKey, data);
 }
 
-Queue.prototype.pop = function(callback) {
-    this.redisClient.brPop(this.queueKey, this.timeOut, callback);
+Queue.prototype.pop = function() {
+    console.log(this.redisClient.brPop(this.queueKey, this.timeOut));
 };
 
 export default Queue;
+
+//queues:logs

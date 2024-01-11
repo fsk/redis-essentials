@@ -1,0 +1,16 @@
+{
+  "name": "6-sixth-example",
+  "version": "1.0.0",
+  "description": "",
+  "main": "leaderboard.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "type": "module",
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "redis": "^4.6.12"
+  }
+}
