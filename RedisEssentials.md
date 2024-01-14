@@ -1,6 +1,10 @@
 # REDIS ESSENTIALS
-Redis bir key-value data storage'dir.
+* <b>Redis bir key-value data storage'dir.</b>
+* <b>Redis Single Thread bir mimariye sahiptir.</b>
+* <b>Redis tek bir CPU çekirdeğinde saniyede 500K tane SET ve Get işlemini gerçekleştirebiliyor.</b>
+* <b>Redis single-thread olmasına rağmen çok hızlıdır çünkü arka tarafta Multiplexing IO teknolojisini kullanır.</b>
 
+NodeJS'te bir Redis Client'i aşağıdaki gibi oluşturulabilir.
 ```
 import { createClient } from 'redis';
 const client = createClient();
@@ -18,8 +22,6 @@ client
     .catch(err => console.log(`${err}`));
 
 ```
-
-*client* için bir connect oluşturulmalı.
 
 ## SET 
 Bu komut ile Redis'e key value set edilebilir.<br>
@@ -124,3 +126,97 @@ güncellediğimiz değerin de TTL değeri aynen korunur.
 >````
 
 <hr>
+
+## INCR
+* O(1) Zamanda çalışır.
+* Bir key değerini 1 arttırır. Arttırılmış değeri geriye döner. Eğer key değeri String'e dönüştürülemeyen
+ya da yanlış bir değer içeriyorsa hata döner.
+* Redis sayıları int olarak ya da başka bir sayı formatında saklamaz. Sayılar redis'e eklenirken String
+formatında saklanır. İşlem yapılacağı zaman tekrar int'e çevrilir.
+* INCR methodu ile kullanılan bir key değeri yoksa bu key değerini önce rediste oluşturur.
+Sonra bu key'in value değerini 0 olarak ayarlar. Akabinde, bu value değerini 1 arttır ve geriye bu arttırılmış
+değeri döner. Yani olmayan bir key değeri ile INCR methodunu kullandığımızda ekranda 1 değerini görürüz.
+* INCR methodu yalnızca 64 bitlik işaretli tamsayılarla çalışır.
+
+> <b>NodeJS Syntax</b>
+> ```
+> const value1 = await client.set("redis-essentials", 292);
+> console.log(`Value1 ==> ${value1}`);
+> const value2 = await client.INCR("redis-essentials");
+> console.log(`Value2 ==> ${value2}`);
+> ```
+> <b>Redis Syntax</b>
+>````
+> SET counter "100"
+> INCR counter
+> ````
+
+## INCRBY
+* O(1) Zamanda çalışır.
+* Bir key değerini verilen sayı kadar arttırır ve yeni değeri geriye döner.
+* Redis sayıları int olarak ya da başka bir sayı formatında saklamaz. Sayılar redis'e eklenirken String
+  formatında saklanır. İşlem yapılacağı zaman tekrar int'e çevrilir.
+* INCR methodu ile kullanılan bir key değeri yoksa bu key değerini önce rediste oluşturur.
+  Sonra bu key'in value değerini 0 olarak ayarlar. Akabinde, bu value değerini 1 arttır ve geriye bu arttırılmış
+  değeri döner. Yani olmayan bir key değeri ile INCR methodunu kullandığımızda ekranda 1 değerini görürüz.
+
+> <b>NodeJS Syntax</b>
+> ```
+> const incrByValue1  = await client.set("spring-boot-in-action", "300");
+> console.log(`INCR_BY_VALUE==> ${incrByValue1}`);
+> const incrByResult1 = await client.incrBy("spring-boot-in-action", "57");
+> console.log(`INCR_BY_RESULT ==> ${incrByResult1}`);
+> ```
+> <b>Redis Syntax</b>
+> ```
+> set number 2
+> incrby number 7
+> ```
+
+## DECR , DECRBY , INCRBYFLOAT
+* DECR ve DECRBY methodları O(1) zamanda çalışır.
+* DECR methodu ile DECRBY methodu INCR ve INCRBY methodlarının tam tersi olarak çalışır.
+> <b>NOT:</b> Başlıktaki komutlar atomiktir.İki farklı client aynı anda aynı komutu çalıştıramaz ve aynı sonucu alamaz.
+> Bu komutlarla ilgili race conditionlar oluşmaz. Race Condition iki farklı kaynağın aynı anda eş zamanlı olarak erişmeye
+> çalıştığında oluşan bir problemdir. Redis, aynı anahtara eş zamanlı erişim durumlarında, sırayla ve tutarlı bir 
+> şekilde komutları işler. Böylece, iki farklı client aynı anda aynı komutu çalıştıramaz ve aynı sonucu alamaz
+
+
+<hr>
+
+## MGET , MSET
+* MGET methodu aynı anda birden fazla key değerinin value'lerini bir <i>liste</i> olarak döndürür. Olmayan bir değer varsa
+<i>nil</i> olarak döndürür.
+* O(N)'de çalışır.
+> <b>Node.js Syntax MGET Methodu</b>
+> ```
+> await client.set("writer1", "Uncle Bob");
+> await client.set("writer2", "Martin Fowler");
+> await client.set("writer3", "Josh Long");
+> const result1 = await client.mGet(["writer1", "writer2", "writer3"]);
+> console.log(result1);
+> ```
+> <b>Redis Syntax MGET Methodu</b>
+> ```
+> mget writer1 writer2 writer3
+> ```
+* MSET methodu aynı anda birden fazla key değeri set etmemizi sağlar.
+* O(N)'de çalışır.
+* Atomik bir işlemdir.
+* Mevcut değerleri yeni değerleriyle değiştirir.
+> <b>Node.js Syntax MSET Methodu</b>
+> ```
+> const keyValueArray = ['writer1', 'Uncle Bob', 'writer2', 'Josh Long', 'writer3', 'Martin Fowler'];
+> const result2 = await client.mSet(keyValueArray);
+> console.log(`RESULT 2 ==> ${result2}`);
+> ```
+> <b>Redis Synrax MGET Methodu</b>
+> ```
+> MSET key1 "Hello" key2 "World"
+> ```
+
+<b>NOT:</b> MSET komutu eğer redis'te bir key değeri varsa onun üzerine yeni value değerini yazar.
+Eğer bu durum olsun istenmiyorsa <b><i>MSETNX</i></b> methodu kullanılabilir.
+
+<hr>
+

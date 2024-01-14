@@ -1,6 +1,8 @@
 /**
  * REDIS CONNECT
+ * SET Method and Flags
  */
+
 import { createClient } from 'redis';
 const client = createClient();
 
