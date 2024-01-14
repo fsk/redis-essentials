@@ -24,7 +24,7 @@ client
 
 <hr>
 
-## SET 
+## <u>SET METHODU</u>
 Bu komut ile Redis'e key value set edilebilir.<br>
 > <b>NodeJS Syntax</b>
 > ````javascript
@@ -49,7 +49,7 @@ Bu komut ile Redis'e key value set edilebilir.<br>
 
 * <b><ins>`PX:`</ins></b> Milisecond cinsinden verinin rediste kalacağı süre.
 <br><br>
-* <ins>`EXAT:`<ins> Timestamp cinsinden verinin rediste kalacağı süre (saniye cinsinden). Yani bunu şu şekilde düşünebiliriz.
+* <b><ins>`EXAT:`<ins></b> Timestamp cinsinden verinin rediste kalacağı süre (saniye cinsinden). Yani bunu şu şekilde düşünebiliriz.
 Bir veri rediste 300 sn kalacaksa, ve o anki epoch time 1650000000 ise biz bunu EXAT kullanıyorsak
 1650000300 yapmalıyız.
 <br><br>
@@ -119,14 +119,14 @@ güncellediğimiz değerin de TTL değeri aynen korunur.
 > ````
 > <b>Redis Syntax</b>
 >`````redis
->set kubernetes "kubernetes in action" EX 15
+> set kubernetes "kubernetes in action" EX 15
 > get kubernetes
 > set kubernetes "kubernetes in practice" KEEPTTL
 >`````
 
 <hr>
 
-## INCR
+## <u>INCR METHODU</u>
 * O(1) Zamanda çalışır.
 * Bir key değerini 1 arttırır. Arttırılmış değeri geriye döner. Eğer key değeri String'e dönüştürülemeyen
 ya da yanlış bir değer içeriyorsa hata döner.
@@ -150,7 +150,7 @@ değeri döner. Yani olmayan bir key değeri ile INCR methodunu kullandığımı
 > INCR counter
 > ````
 
-## INCRBY
+## <u>INCRBY METHODU</u>
 * O(1) Zamanda çalışır.
 * Bir key değerini verilen sayı kadar arttırır ve yeni değeri geriye döner.
 * Redis sayıları int olarak ya da başka bir sayı formatında saklamaz. Sayılar redis'e eklenirken String
@@ -172,7 +172,7 @@ değeri döner. Yani olmayan bir key değeri ile INCR methodunu kullandığımı
 > incrby number 7
 > ````
 
-## DECR , DECRBY , INCRBYFLOAT
+## <u>DECR , DECRBY , INCRBYFLOAT METHODLARI</u>
 * DECR ve DECRBY methodları O(1) zamanda çalışır.
 * DECR methodu ile DECRBY methodu INCR ve INCRBY methodlarının tam tersi olarak çalışır.
 > <b>NOT:</b> Başlıktaki komutlar atomiktir.İki farklı client aynı anda aynı komutu çalıştıramaz ve aynı sonucu alamaz.
@@ -183,7 +183,7 @@ değeri döner. Yani olmayan bir key değeri ile INCR methodunu kullandığımı
 
 <hr>
 
-## MGET , MSET
+## <u>MGET , MSET METHODLARI</u>
 * MGET methodu aynı anda birden fazla key değerinin value'lerini bir <i>liste</i> olarak döndürür. Olmayan bir değer varsa
 <i>nil</i> olarak döndürür.
 * O(N)'de çalışır.
@@ -219,7 +219,7 @@ Eğer bu durum olsun istenmiyorsa <b><i>MSETNX</i></b> methodu kullanılabilir.
 
 <hr>
 
-## LISTS
+## <u>LISTS</u>
 * Listeler Redis'te oldukça esnek bir yapıya sahiptir. Çünkü listeler basit bir collection gibi, stack gibi ya
 queue gibi çalışabilirler.
 * Redis'teki Listeler birer linked list(bağlı liste)dir. Bu yüzden liste'nin başından ya da sonundan eleman eklemeler
@@ -232,10 +232,96 @@ her zaman için O(1)'de yani sabit zamanda gerçekleşir.
 * Redis listeleri, eşzamanlı sistemlerde bile elemanların kuyrukta çakışma olmadan çıkarılmasını sağlar. Liste 
 komutlarının otomatik olması, bir işlemin tamamen gerçekleşeceğini ya da hiç gerçekleşmeyeceğini garanti eder.
 
-### LPUSH , RPUSH
+### LPUSH , RPUSH METHODLARI
 * LPUSH methodu veriyi listenin başına ekler. STACK yapısını taklit etmek için kullanılır.
-````redis
-lpush bookList "spring-boot-in-action"
-lpush bookList "docker-in-action"
-lpush bookList "kubernetes-in-action", "redis-essentials"
-````
+* Listeye ilk başta bir eleman eklenirse geriye 1 döner. Eğer başka bir eleman eklenirse bu sefer 2 döner. Aynı anda 3
+eleman daha eklenirse 5 döner. Yani bu şekildeki her bir operasyondan sonra geriye listenin size'ını döner.
+> <b>Node.js Syntax LPUSH Methodu</b>
+> ````javascript
+> const value1 = await client.lPush('books', 'Clean Code');
+> console.log(`VALUE1 ==> ${value1}`);
+> const value2 = await client.lPush('books', ['Redis Essentials', 'Refactoring']);
+> console.log(`VALUE2 ==> ${value2}`);
+> ````
+> <b>Redis Syntax LPUSH Methodu</b>
+> ````redis
+> lpush bookList "spring-boot-in-action"
+> lpush bookList "docker-in-action"
+> lpush bookList "kubernetes-in-action" "redis-essentials"
+> ````
+<b>NOT:</b> İlk önce <i>spring-boot-in-action</i> değerini ekler. Sonrasında listenin başına 
+<i>docker-in-action</i> değerini ekler.<br> 
+<br>En sonunda liste <br>
+1) redis-essentials<br>
+2) kubernetes-in-action<br>
+3) docker-in-action<br>
+4) spring-boot-in-action<br>
+<br>
+şeklinde olur.
+
+* RPUSH methodu veriyi listenin sonuna ekler. QUEUE Yapısını taklit etmek için kullanılır.
+* Listeye ilk başta bir eleman eklenirse geriye 1 döner. Eğer başka bir eleman eklenirse bu sefer 2 döner. Aynı anda 3
+eleman daha eklenirse 5 döner. Yani bu şekildeki her bir operasyondan sonra geriye listenin size'ını döner.
+
+> <b>Node.js Syntaxı</b>
+> ````javascript
+> const addSingleValue = await client.rPush('languages', 'Javascript');
+> console.log(`SINGLE VALUE ==> ${addSingleValue}`);
+> const addMultipleValue = await client.rPush('languages', ['Java', 'Python', 'C']);
+>console.log(`ADD MULTIPLE VALUE ==> ${addMultipleValue}`);
+> ````
+> <b>Redis Syntax RPUSH Methodu</b>
+> ````redis
+> rpush bookList "spring-boot-in-action"
+> rpush bookList "docker-in-action"
+> rpush bookList "kubernetes-in-action" "redis-essentials"
+> ````
+<b>NOT:</b> RPUSH methodunda hangi sırayla veri geldiyse o şekilde eklenir.<br>
+Yani liste şu şekilde olur.<br>
+1) Javascript
+2) Java
+3) Python
+4) C
+
+### LLEN METHODU
+* Key'in sahip olduğu listenin uzunluğunu dönderir. Eğer key değeri mevcut değilse boş bir liste olarak yorumlanır ve 0
+değerini geriye döner. Eğer key değerinin içerisindeki value bir liste değilse de hata döner.
+* O(1) zamanda çalışır.
+> <b>Node.js Syntax</b>
+> ````javascript
+> const lengthFromRedisList = await client.lLen('languages');
+> console.log(`LENGTH FROM REDIS LIST LANGUAGES ==> ${lengthFromRedisList}`);
+> ````
+> <b>Redis Syntax</b>
+> ````redis
+> llen languages
+> ````
+
+### LINDEX METHODU
+* Key'in sahip olduğu listedeki verilen değerin listedeki karşılığını döner. Her programlama dilinde olduğu gibi
+redis'te de listeler 0.index'ten başlar.
+* <b>ÇOK ÖNEMLİ NOT:</b> Redis'te 0. index ilk elemanı gösterirken -1. index son elemanı gösterir. Yani elimizde bir dizi
+olduğunu kabul edelim. <br>
+[17, 13, 2, 5, 3, 7]<br>
+Bu dizinin 0. indexi 17'dir. 1. indexi 13'tür.
+Ama aynı zamanda -1. indeksi 7'dir. -2. indexi 3'tür.
+
+> <b>Node.js Syntax</b>
+> ````javascript
+> const lIndexZero = await client.lIndex('languages', 0);
+> console.log(`0. index ==> ${lIndexZero}`);
+> 
+> const lIndexPozitiveOne = await client.lIndex('languages', 1);
+> console.log(`1. index ==> ${lIndexPozitiveOne}`);
+> 
+> const lIndexNegativeOne = await client.lIndex('languages', -1);
+> console.log(`-1. index ==> ${lIndexNegativeOne}`);
+> 
+> const lIndexNegativeTwo = await client.lIndex('languages', -2);
+> console.log(`-2. index ==> ${lIndexNegativeTwo}`);
+> ````
+> <b>Redis Syntax</b>
+> ````
+> lindex languages -2
+> lindex languages 0
+> ````
