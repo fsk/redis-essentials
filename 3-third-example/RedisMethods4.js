@@ -48,6 +48,25 @@ const lIndexNegativeTwo = await client.lIndex('languages', -2);
 console.log(`-2. index ==> ${lIndexNegativeTwo}`);
 
 
+/**
+ * LRANGE
+ */
+
+const lRangeArr = await client.lRange('languages', 1, -1);
+console.log(`Elements of Redis List wit lRange Method ==> ${lRangeArr}`);
+
+
+/**
+ * RPOP
+ */
+
+const rPop = await client.rPop('languages');
+console.log(`rPop Method ==> ${rPop}`);
+
+
+await client.flushAll()
+
+
 client
     .quit()
     .then(r => console.log(`${r}`))

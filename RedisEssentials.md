@@ -21,8 +21,9 @@ client
     .then(r => console.log(`${r}`))
     .catch(err => console.log(`${err}`));
 ````
-
+<br>
 <hr>
+<br>
 
 ## <u>SET METHODU</u>
 Bu komut ile Redis'e key value set edilebilir.<br>
@@ -124,7 +125,9 @@ güncellediğimiz değerin de TTL değeri aynen korunur.
 > set kubernetes "kubernetes in practice" KEEPTTL
 >`````
 
+<br>
 <hr>
+<br>
 
 ## <u>INCR METHODU</u>
 * O(1) Zamanda çalışır.
@@ -180,8 +183,9 @@ değeri döner. Yani olmayan bir key değeri ile INCR methodunu kullandığımı
 > çalıştığında oluşan bir problemdir. Redis, aynı anahtara eş zamanlı erişim durumlarında, sırayla ve tutarlı bir 
 > şekilde komutları işler. Böylece, iki farklı client aynı anda aynı komutu çalıştıramaz ve aynı sonucu alamaz
 
-
+<br>
 <hr>
+<br>
 
 ## <u>MGET , MSET METHODLARI</u>
 * MGET methodu aynı anda birden fazla key değerinin value'lerini bir <i>liste</i> olarak döndürür. Olmayan bir değer varsa
@@ -217,7 +221,9 @@ değeri döner. Yani olmayan bir key değeri ile INCR methodunu kullandığımı
 <b>NOT:</b> MSET komutu eğer redis'te bir key değeri varsa onun üzerine yeni value değerini yazar.
 Eğer bu durum olsun istenmiyorsa <b><i>MSETNX</i></b> methodu kullanılabilir.
 
+<br>
 <hr>
+<br>
 
 ## <u>LISTS</u>
 * Listeler Redis'te oldukça esnek bir yapıya sahiptir. Çünkü listeler basit bir collection gibi, stack gibi ya
@@ -325,3 +331,169 @@ Ama aynı zamanda -1. indeksi 7'dir. -2. indexi 3'tür.
 > lindex languages -2
 > lindex languages 0
 > ````
+
+### LRANGE METHODU
+* Bu method key'in sahip olduğu liste'nin elemanlarını, parametre olarak verilen başlangıç indexi ve bitiş indeksine 
+göre bir array olarak döndürür.
+* <u><b>ÇOK ÖNEMLİ NOT:</b></u> Redis'te listelerde ilk eleman 0. indeksten başlar. Son eleman da -1. indeksten başlar.
+İkinci eleman 1. index'tir. Sondan bir önceki eleman ise -2. indekstir.
+* Bu method hata dönmez. yani range'ın dışında bir indis girildiği zaman hata alınmaz. Eğer methoda verilen 
+başlangıç indeksi list'in size'ından büyükse boş bir array döner. Eğer stop parametresi daha büyükse redis son eleman gibi
+davranır.
+> <b>Node.js Syntax</b>
+> ````javascript
+> const lRangeArr = await client.lRange('languages', 1, -1);
+> console.log(`Elements of Redis List wit lRange Method ==> ${lRangeArr}`);
+> ````
+> <b>Redis Syntax</b>
+> ````redis
+> lrange bookList 0 -1
+> ````
+
+### RPOP , LPOP
+* RPOP methodu listenin en sonundaki elemanı siler ve geriye döner. Fakat optional olarak bir sayı verilirse de o kadar 
+elemanı çıkarır ve geriye döner.
+* Aynı şekilde LPOP methodu da listenin en başındaki elemanı siler ve geriye döner.
+> <b>Node.js Syntax</b>
+> ````javascript
+> const rPop = await client.rPop('languages');
+> console.log(`rPop Method ==> ${rPop}`);
+> ````
+> <b>Redis Syntax</b>
+> ````redis
+> rpop bookList
+> ````
+
+<br>
+<hr>
+<br>
+
+## HASHES
+* Hash'ler keyleri valueler ile eşleyebildiğimiz bir veri yapısıdır. Hem bellek kullanımını etkin bir şekilde optimize
+ederler hem de verileri çok hızlı ararlar. Bir Hash'te hem alan adı hem de değer String'dir. Dolayısıyla, bir Hash, 
+String'den String'e bir eşlemedir. 
+* Hash'lerin bir diğer büyük avantajı bellek optimizasyonudur. Bu optimizasyon, 
+<i>hash-max-ziplist-entries</i> ve <i>hash-max-ziplist-value</i> konfigürasyonlarına dayanır. 
+İç yapısı itibarıyla, bir Hash ya bir <i>ziplist</i> ya da bir <i>hash table</i> olabilir. Bir ziplist, 
+bellek açısından etkin olacak şekilde tasarlanmış çift yönlü bir linked list'tir. Bir ziplist'te, 
+tamsayılar karakter dizisi yerine gerçek tamsayılar olarak saklanır. Bir ziplist bellek optimizasyonlarına sahip olsa da, 
+aramalar sabit zamanda gerçekleştirilmez. Diğer taraftan, bir hash table sabit zamanda arama yapabilir ancak bellek açısından 
+optimize edilmemiştir
+
+### HSET METHODU
+* Bir key değerine `Key-Value Pair` olacak şekilde veri ekler. Eğer key değeri varsa value'sinin üzerine yazar.
+Eğer key değeri yoksa yeniden oluşturur. Eğer değer başarılı bir şekilde eklenirse 1 döner. Eğer ilgili key değeri varsa
+(ki bu durumda key değeri sabit kalarak value değeri değişir) o zaman da 0 değeri döner.
+
+> <b>Node.js Syntax</b>
+> ````javascript
+> const setHash = await client.hSet("movie", {title: "The Godfather"});
+> console.log(`Create HSET ==>  ${setHash}`);
+> ````
+> <b>Redis Syntax</b>
+> ````
+> hset movie "title" "The Godfather"
+> ````
+
+### HMSET METHODU
+* Normalde bu method ile bir map'e aynı anda birden fazla key value değeri eklemesi yapolabilirdi.
+* Fakat bu method Redis 4.0'dan beri depreceted'dir. Bunun yerine yine HSET komutu kullanarak da aynı işlem yapılabilir.
+> <b>Node.js Syntax</b>
+> ````javascript
+> const setHashBook = await client.hSet("books",
+>    {
+>        book1: 'Clean Code', writer1: 'Robert C. Martin',
+>        book2: 'Refactoring', writer2: 'Martin Fowler',
+>    }
+> );
+> ````
+> <b>Redis Syntax</b>
+> ````redis
+> HSET books book3 'GRPC Go Microservice' writer3 'Huseyin Babal' book4 'Redis Essentials' writer4 'Hugo Lopes'
+> ````
+
+### HINCRBY , HINCRBYFLOAT , INCRBY , INCRBYFLOAT METHODLARI
+* HINCRBY methodu bir Hset içerisindeki bir field'ın değerini verilen parametre kadar arttırır.
+> <b>Node.js Syntax</b>
+> ````javascript
+> const prices = await client.hSet("phones",
+>     {
+>         phone1: "iphone15", price1: 150,
+>         phone2: "samsung", price2: 130
+>     }
+> );
+> 
+> console.log(`Create Prices ==>  ${prices}`);
+> 
+> const hIncrByPrice = await client.hIncrBy('phones', 'price1', 17);
+> console.log(`HINCRBY price iphone ==>  ${hIncrByPrice}`);
+> ````
+> <b>Redis Syntax</b>
+> ````redis
+> HSET notlar "matematik" 90 "Turkce" 70
+> hincrby notlar "matematik" 10
+> ````
+
+* INCRBY methodu keyde saklanan sayıyı increment kadar artırır. Eğer key mevcut değilse, işlemi gerçekleştirmeden önce 
+0 olarak ayarlanır. Key yanlış bir tipin değerini içeriyorsa veya bir tamsayı olarak temsil edilemeyen bir string 
+içeriyorsa bir hata döndürülür. 
+* Bu işlem 64 bit işaretli tamsayılarla sınırlıdır.
+* HINCRBYFLOAT ve INCRBYFLOAT methodları da aslında bu methodları tam sayı değilde noktalı sayılar cinsinden yapılmasını
+sağlar.
+
+### HGET ,HMGET METHODLARI
+* HGET methodu Redis key'inin içindeki key-value pairlerinden key'i verdiğimizde value'yi getirir.
+* O(1)'de çalışır.
+> <b>Node.js Syntax</b>
+> ````javascript
+> const hGetBooks = await client.hGet('books', 'book1');
+> console.log(`HGET From Books ==>  ${hGetBooks}`);
+> ````
+> <b>Redis Syntax</b>
+> ````redis
+> hget books book1
+> ````
+* HMGET Methodu bir hash'deki birden fazla value değerini getirir.
+* O(N)'de çalışır.
+> <b>Node.js Syntax</b>
+> ````javascript
+> const hmGetFieldArr = ['book1', 'writer1'];
+> const hmGetBooks = await client.hmGet('books', hmGetFieldArr);
+> console.log(`HMGET From Books ==>  ${hmGetBooks}`);
+> ````
+> <b>Redis Syntax</b>
+> ````redis
+> hmget books writer1 book1
+> ````
+
+### HDEL METHODU
+* Bir hash içerisindeki değeri siler.
+* O(N)'de çalışır.
+* Geriye Integer 1 döner. Eğer olmayan bir değer silinmeye çalışılırsa 0 döner.
+> <b>Node.js Syntax</b>
+> ````javascript
+> const hDelFromPhone = await client.hDel('phones', 'phone1');
+> console.log(`HDEL From Phones ==>  ${hDelFromPhone}`);
+> ````
+> <b>Redis Syntax</b>
+> ````redis
+> hdel books writer1 book1
+> ````
+
+### HGETALL METHODU
+* Hash'deki bütün verileri getirir.
+* O(N)' de çalışır.
+> <b>Node.js Syntax</b>
+> ````javascript
+> const hGetAllFromBooks = await client.hGetAll('books');
+> console.log(JSON.stringify(hGetAllFromBooks, null, 2));
+> ````
+> <b>Redis Syntax</b>
+> ````redis
+> hgetall books
+> ````
+* HGETALL komutu, bir Hash çok sayıda alan içeriyorsa ve çok fazla bellek kullanıyorsa bir problem olabilir. 
+Tüm bu verilerin ağ üzerinden aktarılması gerektiği için Redis'i yavaşlatabilir. Böyle bir senaryoda iyi bir alternatif 
+`HSCAN` komutudur. HSCAN, tüm alanları bir seferde döndürmez. Bir cursor ve Hash alanlarını değerleriyle birlikte 
+parçalar halinde döndürür. Bir Hash'teki tüm alanları almak için döndürülen cursor 0 olana kadar HSCAN komutunun tekrar 
+tekrar çalıştırılması gerekir.

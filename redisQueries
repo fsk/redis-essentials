@@ -1,0 +1,155 @@
+keys *
+
+keys *
+get springboot
+
+set springboot "Spring Boot in Action" NX
+set springboot "ABC" NX
+
+set springboot "Spring Boot in Action" EX 15
+
+
+set springboot "Spring Boot in Practice"
+    get springboot
+set springboot "Spring Boot in Action" XX
+
+set docker "docker in action"
+    get docker
+SET docker "docker in practice" GET
+    get docker
+
+
+    keys *
+set kubernetes "kubernetes in action" EX 15
+    get kubernetes
+set kubernetes "kubernetes in practice" KEEPTTL
+
+
+SET kubernetes "kubernetes in action" EX 15 NX
+set kubernetes "kubernetes in action" KEEPTTL
+
+    keys *
+    get kubernetes
+
+SET counter "100"
+    INCR counter
+
+set number 2
+    incr number
+
+    incr sayi
+
+    keys *
+set number 2
+    incrby number 7
+
+
+set "writer1" "uncle bob"
+set "writer2" "martin fowler"
+set "writer3" "josh long"
+
+    mget writer1 writer2 writer3
+
+
+    lpush bookList "spring-boot-in-action"
+    lpush bookList "docker-in-action"
+    lpush bookList "kubernetes-in-action" "redis-essentials"
+
+    rpush bookList "spring-boot-in-action"
+    rpush bookList "docker-in-action"
+    rpush bookList "kubernetes-in-action" "redis-essentials"
+
+    lrange bookList 0 -1
+
+    lrange languages 0 -1
+
+    llen languages
+
+    lindex languages -2
+    lindex languages 0
+
+    FLUSHALL
+
+
+    keys *
+    lrange queue:logs
+
+    sadd user:furkan:favorite_artists "Tarkan" "Murat Dalkilic" "Oguzhan Koc" "Murat Boz"
+    sadd user:furkan:favorite_artists "Bengu"
+
+    sadd user:alperen:favorite_artists "Murat Boz" "Bengu" "Emel Sayin"
+
+    sinter user:furkan:favorite_artists
+    sinter user:alperen:favorite_artists
+
+    sinter user:furkan:favorite_artists user:alperen:favorite_artists
+
+    sdiff user:furkan:favorite_artists user:alperen:favorite_artists
+    sdiff user:alperen:favorite_artists user:furkan:favorite_artists
+    sdiff user:furkan:favorite_artists
+
+    sunion user:furkan:favorite_artists user:alperen:favorite_artists
+
+    srandmember user:furkan:favorite_artists
+    srandmember user:alperen:favorite_artists
+
+    sismember user:furkan:favorite_artists "Murat Boz"
+
+    ZADD leaders 100 "Furkan"
+    ZADD leaders 100 "Sahin"
+    ZADD leaders 101 "Evren" 102 "Cagri"
+    ZRANGE leaders 0 -1
+    ZREVRANGE leaders 0 -1
+    ZRANK leaders "Cagri"
+
+    ZSCORE leaders "Furkan"
+
+    ZREM leaders "Evren"
+
+    ZREVRANGE leaders 0 -1 WITHSCORES
+
+    KEYS *
+
+    ZRANGE mySortedSet 0 -1 withscores
+
+    ZADD mySortedSet XX 2019 "Ankara"
+
+    FLUSHALL
+
+    rpush bookList "spring-boot-in-action"
+    rpush bookList "docker-in-action"
+    rpush bookList "kubernetes-in-action" "redis-essentials"
+
+    lrange bookList 0 -1
+
+    rpop bookList
+
+    hset movie "title" "The Godfather"
+    hset movie "title" "The Truman Show"
+    hget movie title
+
+    keys *
+
+    hget movie title
+
+    hget books book2
+
+    HSET books book3 'GRPC Go Microservice' writer3 'Huseyin Babal' book4 'Redis Essentials' writer4 'Hugo Lopes'
+
+    hget books 'writer4'
+
+    HSET notlar "matematik" 90 "Turkce" 70
+    hincrby notlar "matematik" 10
+
+    keys *
+
+    hget books writer1
+
+    hmget books writer1 book1
+
+    hdel books writer2 book2
+
+    hgetall books
+
+
+    flushall
