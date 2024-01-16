@@ -497,3 +497,225 @@ Tüm bu verilerin ağ üzerinden aktarılması gerektiği için Redis'i yavaşla
 `HSCAN` komutudur. HSCAN, tüm alanları bir seferde döndürmez. Bir cursor ve Hash alanlarını değerleriyle birlikte 
 parçalar halinde döndürür. Bir Hash'teki tüm alanları almak için döndürülen cursor 0 olana kadar HSCAN komutunun tekrar 
 tekrar çalıştırılması gerekir.
+
+<br>
+<hr>
+<br>
+
+## SET
+* Redis'te bir Set, tekrarlanana elemanların eklenemeyeceği farklı String'lerin sırasız bir collectionudur.
+* Bir Set hash table olarak uygulanmıştır. Bu da aslında bazı işlerin daha da optimize edilmesine olanak sağlamıştır.
+* Eleman ekleme, eleman silme ve arama işlemleri sabit zamanda(constant time) yani O(1)'de gerçekleşir.
+* Bir Set'in tutabileceği maksimum eleman sayısı 2^32-1'dir, bu da Set başına 4 milyardan fazla eleman olabileceği 
+anlamına gelir.
+* Eğer Set içindeki tüm elemanlar tamsayı ise, bellek kullanımı daha verimli hale gelir. 
+* <i>Set-Max-Intset-Entries Konfigürasyonu:</i> Bu konfigürasyon, Set içindeki tamsayı elemanların maksimum sayısını belirler. 
+Bu değer, Set'in nasıl saklandığını ve ne kadar bellek kullandığını etkileyebilir.
+
+### SADD METHODU
+* Bir veya daha fazla elemanı Set'e ekler.
+* Eğer bir eleman ekleyeceksek O(1)'de çalışır. Eğer birden fazla eleman ekleyeceksek O(N)'de çalışır.
+* Bir eleman eklenirse geriye integer 1 döner, N tane eleman ekleyeceksek geriye N döner.
+* Eğer eklenen değer daha önceden Set içerisinde var ise geriye integer 0 döner.
+> <b>Node.js Syntax</b>
+> ````javascript
+> const addToSet = await client.sAdd('soccers', 'Fernando Muslera');
+> console.log(`Add To Set ==> ${addToSet}`);
+> 
+> const addToSetMultipleVal = await client.sAdd('soccers', ['Wesley Sneijder', 'Didier Drogba']);
+> console.log(`Add To Set Multiple Value ==> ${addToSetMultipleVal}`);
+> ````
+> <b>Redis Syntax</b>
+> ````redis
+> sadd soccers 'Felipe Melo'
+> sadd soccers 'Selcuk Inan' 'Torreira' 'Icardi'
+> ````
+
+### SINTER METHODU
+* Bir veya daha fazla Set'i parametre olarak bekler.
+* Eğer bir Set parametre verilirse, ilgili Set'in içerisindeki elemanlar array olarak döner.
+* Eğer birden fazla Set parametre olarak verilirse, bu Set'lerdeki elemanlardan ortak olanlar geriye döner.
+> <b>Node.js Syntax</b>
+> ````javascript
+> await client.sAdd('technicalbooks',
+>     [
+>         'Clean Code',
+>         'Clean Architecture',
+>         'Redis Essentials',
+>         'ElasticSearch in Action',
+>         'Effective Java'
+>     ]
+> );
+> 
+> await client.sAdd('backendbooks',
+>     [
+>         'Clean Architecture',
+>         'Effective Java',
+>         'Spring Boot in Practice',
+>         'Redis Essentials'
+>     ]
+> );
+> 
+> await client.sAdd('devopsbooks',
+>     [
+>          'Redis Essentials',
+>          'Clean Architecture',
+>          'ElasticSearch in Action'
+>     ]
+> );
+> 
+> const setArray = ['technicalbooks', 'backendbooks', 'devopsbooks']
+> const allSetsMemberBooks = await client.sInter(setArray);
+> 
+> console.log(`Set Intersection ==> ${allSetsMemberBooks}`);
+> ````
+> <b>Redis Syntax</b>
+> ````redis
+> sadd technicalbooks 'Clean Code' 'Clean Architecture' 'Redis Essentials' 'ElasticSearch in Action' 'Effective Java'
+> sadd backendbooks 'Clean Architecture' 'Effective Java' 'Spring Boot in Practice' 'Redis Essentials'
+> sadd devopsbooks 'Redis Essentials' 'Clean Architecture' 'ElasticSearch in Action' 'Redis Essentials'
+> 
+> sinter technicalbooks
+> 
+> sinter technicalbooks backendbooks devopsbooks
+> ````
+
+### SDIFF METHODU
+* Bir veya birden fazla Set'i parametre olarak bekler.
+* Bu komut ilk Set'te bulunan, ancak takip eden Set'lerde bulunmayan tüm ögeleri içeren bir array döndürür.
+* Bu komutta key'lerin sırası önemlidir. Var olmayan herhangi bir key, boş bir set olarak kabul edilir.
+> <b>Node.js Syntax</b>
+> ````javascript
+> await client.sAdd('technicalbooks',
+>     [
+>         'Clean Code',
+>         'Clean Architecture',
+>         'Redis Essentials',
+>         'ElasticSearch in Action',
+>         'Effective Java'
+>     ]
+> );
+> 
+> await client.sAdd('backendbooks',
+>     [
+>          'Clean Architecture',
+>          'Effective Java',
+>          'Spring Boot in Practice',
+>          'Redis Essentials'
+>     ]
+> );
+> 
+> await client.sAdd('devopsbooks',
+>     [
+>          'Redis Essentials',
+>          'Clean Architecture',
+>          'ElasticSearch in Action'
+>     ]
+> );
+> ````
+> <b>Redis Syntax</b>
+> ````redis
+> sdiff technicalbooks backendbooks
+> ````
+
+### SUNION METHODU
+* Parametre olarak verilen Set'lerdeki verilerin tamamını birleştirir ve geriye bir array dönderir.
+* Aynı değerlerden birden fazla olursa o değerleri tekler.
+* O(N)'de çalışır.
+> <b>Node.js Syntax</b>
+> ````javascript
+> const booksArray = ['technicalbooks', 'backendbooks', 'devopsbooks'];
+> const sUnion = await client.sUnion(booksArray);
+> sUnion.forEach(item => console.log(item));
+> ````
+> <b>Redis Syntax</b>
+> ````redis
+> sunion technicalbooks backendbooks devopsbooks
+> ````
+
+### SRANDMEMBER
+* Bir Set'ten rastgele bir üye döndürür. Set'ler unordered(sırasız) olduğu için belirli bir pozisyondan elemanları almak
+mümkün değildir.
+* Pozitive ne Negative değerler alabilir.
+* Eğer count argümanı pozitif bir sayı olarak verilirse, Set içinden benzersiz elemanlar içeren bir dizi döndürülür.
+Bu dizi, ya belirtilen count sayısı kadar eleman içerir ya da Set'in toplam eleman sayısına (kardinalitesine) eşit olur;
+hangisi daha azsa o kadar eleman içerir.
+* Eğer count argümanı negatif bir sayı olarak verilirse, komutun davranışı değişir ve aynı elemanın birden fazla kez 
+döndürülmesine izin verilir. Bu durumda, döndürülen eleman sayısı, count argümanının mutlak değeri kadardır.
+> <b>Node.js Syntax</b>
+> ````javascript
+> const programmingLanguagesArr = [
+>     'C', 'C#', 'C++', 'Java', 'Javascript', 'TypeScript', 'Go', 'Ruby', 'PHP', 'Python'
+> ]
+> 
+> await client.sAdd('programminglanguages', programmingLanguagesArr);
+> 
+> const randomMember = await client.sRandMember('programminglanguages');
+> console.log(`Random Member ==> ${randomMember}`);
+> //Not: Yukarıdaki kod her çalıştığında console'da farklı bir değer göreceğiz.
+> ````
+> <b>Redis Syntax</b>
+> ````redis
+> srandmember programminglanguages
+> ````
+### SISMEMBER METHODU
+* Bir Set içerisinde bir değer var mı yok mu onu kontrol eder.
+* Eğer değer varsa geriye integer 1 döner, eğer değer yoksa integer 0 döner.
+* O(1)'de çalışır.
+> <b>Node.js Syntax</b>
+> ````javascript
+> const isExistInSet = await client.sIsMember('programminglanguages', 'Go');
+> console.log(`Is Exist in Set ==> ${isExistInSet}`);
+> //Not: Bu kod node.js tarafında true/false döner.
+> ````
+> <b>Redis Syntax</b>
+> ````redis
+> sismember programminglanguages 'Go'
+> //NOT: Bu kod Intellijn db konsolunda çalıştığında true/false döner ama Redis-Cli da çalıştığında 0/1 döner.
+> ````
+
+### SREM METHODU
+* Set'ten değer siler ve değeri geriye döner.
+* Eğer key değeri yoksa empty set gibi davranır ve geriye 0 döner.
+* Set'in üyesi olmayan bir değer verildiğinde bunu gözardı (ignore) eder.
+* Bir veya daha fazla eleman aynı anda silinebilir.
+* Bir eleman silinecekse O(1)'de çalışılır. N eleman çıkarılacaksa O(N)'de çalışır.
+> <b>Node.js Syntax</b>
+> ````javascript
+> const deleteFromSet = await client.sRem('programminglanguages', 'C#');
+> console.log(`delete set ==> ${deleteFromSet}`);
+> ````
+> <b>Redis Syntax</b>
+> ````redis
+> srem programminglanguages 'Python'
+> ````
+> <b>Not:</b> Bu kodlar intellij'de çalıştırıldığında geriye integer 1 döner ama redis-cli'da çalıştırıldığı zaman
+> geriye ilgili değerin kendisi döner.
+
+### SCARD METHODU
+* Key değeri verilen Set'in eleman sayısını geriye dönderir.
+* O(1)'de çalışır.
+> <b>Node.js Syntax</b>
+> ````javascript
+> const setMemberCount = await client.sCard('programminglanguages');
+> console.log(`Member Count ==> ${setMemberCount}`);
+> ````
+> <b>Redis Syntax</b>
+> ````redis
+> scard programminglanguages
+> ````
+
+### SMEMBERS METHODU
+* Parametre olarak verilen Set'teki elemanları geriye dönderir.
+* Eğer SINTER Methodu'da tek parametre ile çalıştırılırsa aynı etkiyi yapar.
+> <b>Node.js Syntax</b>
+> ````javascript
+>  const allMembers = await client.sMembers('programminglanguages');
+>  allMembers.forEach(item => {
+>        console.log(item);
+>  });
+> ````
+> <b>Redis Syntax</b>
+> ````redis
+> smembers programminglanguages
+> ````
