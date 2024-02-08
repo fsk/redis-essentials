@@ -1,4 +1,4 @@
-import {createClient} from "redis";
+import { createClient } from "redis";
 
 const client = createClient();
 
@@ -33,7 +33,7 @@ async function main() {
             "value": "Canakkale"
         }
     ]
-    await addItemToSortedSet('mySortedSet', cities, );
+    await addItemToSortedSet('mySortedSet', cities,);
 
     try {
         await client.quit();

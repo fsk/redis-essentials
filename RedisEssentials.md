@@ -725,3 +725,54 @@ döndürülmesine izin verilir. Bu durumda, döndürülen eleman sayısı, count
 > ````redis
 > smembers programminglanguages
 > ````
+<hr>
+
+## SORTED SET
+* Rediste sorted set'ler aslında set yapılarına çok benzerdir.
+* Redis Sorted Set'ler ilişkişli bir puana göre sıralanan, benzersiz String üyelerden oluşan bir collectiondur.
+* Eğer aynı score'a sahip birden fazla üye varsa, bu sefer alfabetik olarak sıralanır.
+* Sorted Set'ler Set'in ve Hash'in karışımı olarak düşünülebilir.
+
+### ZADD METHODU
+* Bir sorted set'e eleman ekler.
+* Belirtilen key'de saklanan sorted set'e, belirtilen score'larla tüm belirtilen üyeler eklenir. 
+* Birden fazla score/member çifti belirtmek mümkündür. 
+* Belirtilen bir üye zaten sorted set'in bir üyesiyse, score güncellenir ve eleman doğru sıralamayı sağlamak için doğru pozisyona tekrar yerleştirilir.
+* Eğer key mevcut değilse, belirtilen üyelerle yeni bir sorted set oluşturulur, sanki sorted set boşmuş gibi. Eğer key mevcutsa ama bir sorted set içermiyorsa, bir hata döndürülür.
+> <b>Node.js Syntax</b>
+> ````javascript
+>const cities = [
+>    {
+>        "score": 2020,
+>        "value": "Sarajevo"
+>    },
+>    {
+>        "score": 2020,
+>        "value": "Canakkale"
+>    }
+>]
+>
+>const addToSortedSet = await client.zAdd('mySortedSet', cities);
+> ````
+> <b>Redis Syntax</b>
+> ````redis
+> zadd mySortedSet 2024 "Ankara"
+> ````
+
+### SET METHODU FLAG'LERİ
+* <b><ins>`XX:`</ins></b> Sadece zaten mevcut olan elemanların güncellenmesini sağlar. Yeni bir eleman eklemez.
+<br><br>
+
+> <b>Node.js Syntax</b>
+> ````javascript
+>const city = {
+>    "score": 1923,
+>    "value": "Ankara"
+>}
+>const zAddWithNXFlag = await client.zAdd('cities', city, {XX: true})
+>console.log(`${zAddWithNXFlag}`);
+> ````
+> <b>Redis Syntax</b>
+> ````redis
+> zadd cities XX 1905 "Ankara"
+> ````
