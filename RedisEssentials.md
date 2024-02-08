@@ -4,6 +4,12 @@
 * <b>Redis tek bir CPU çekirdeğinde saniyede 500K tane SET ve Get işlemini gerçekleştirebiliyor.</b>
 * <b>Redis single-thread olmasına rağmen çok hızlıdır çünkü arka tarafta Multiplexing IO teknolojisini kullanır.</b>
 
+
+## Redis'i başlatmak için
+* Redis'i başlatmak için öncelikle redisin kurulu olduğu klasöre gidilir.
+* src klasörünün altına girdikten sonra, bu dosya yolunda, terminal ekranda, `./redis-server` komutu çalıştırılır.
+* Bu komut çalıştırıldıktan sonra bu tab'ı kapatmadan, aynı dosya yolunda farklı bir terminal tabı açılarak `./redis-cli`komutu çalıştırılır. 
+
 NodeJS'te bir Redis Client'i aşağıdaki gibi oluşturulabilir.
 ````javascript
 import { createClient } from 'redis';
