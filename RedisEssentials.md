@@ -759,9 +759,8 @@ döndürülmesine izin verilir. Bu durumda, döndürülen eleman sayısı, count
 > zadd mySortedSet 2024 "Ankara"
 > ````
 
-### SET METHODU FLAG'LERİ
+### ZADD METHODU FLAG'LERİ
 * <b><ins>`XX:`</ins></b> Sadece zaten mevcut olan elemanların güncellenmesini sağlar. Yeni bir eleman eklemez.
-<br><br>
 
 > <b>Node.js Syntax</b>
 > ````javascript
@@ -776,3 +775,164 @@ döndürülmesine izin verilir. Bu durumda, döndürülen eleman sayısı, count
 > ````redis
 > zadd cities XX 1905 "Ankara"
 > ````
+
+* <b><ins>`NX:`</ins></b> Sadece yeni bir eleman ekler. Var olan bir elemanı güncellemez.
+
+> <b>Node.js Syntax</b>
+>````javascript
+>const newCity = {
+>    "score": 1940,
+>    "value": "Istanbul"
+>}
+>const zAddWithNXFlag = await client.zAdd('cities', newCity, {NX: true});
+>console.log(`${zAddWithNXFlag}`);
+>````
+> <b>Redis Syntax</b>
+> ````redis
+> zadd cities NX 1994 Hatay
+> ````
+
+* <b><ins>`LT:`</ins></b> Gelen yeni score eğer elemanın score'undan daha küçükse güncelleme yapar.
+Yoksa güncelleme yapmaz. Yeni eleman eklenmesine engel değildir. Yani gelen değer, eğer ilgili sorted
+set'te gelen eleman yoksa bu değeri ekler.
+> <b>Node.js Syntax</b>
+> ````javascript
+> const update_LT_element = {
+>     "score": 2000,
+>     "value": "Sarajevo"
+> }
+> 
+> const zAddWithLTFlagUpdateElement = await client.zAdd('cities', update_LT_element, {LT: true});
+> console.log(`LT FLAGI calistirildi. => ${zAddWithLTFlagUpdateElement}`);
+> 
+> const add_LT_element = {
+>     "score": 1994,
+>     "value": "Hatay"
+> }
+> 
+> const zAddWithLTFlagAddElement = await client.zAdd('cities', add_LT_element, {LT: true});
+> console.log(`LT FLAGI calistirildi. => ${zAddWithLTFlagAddElement}`);
+> ````
+> <b>Redis Syntax</b>
+> ````redis
+> zadd cities LT 140 "Ankara"
+> ````
+
+* <b><ins>`GT:`</ins></b> Gelen yeni score eğer elemanın score'undan daha büyükse güncelleme yapar.
+Yoksa güncelleme yapmaz. Yeni eleman eklenmesine engel değildir. Yani gelen değer, eğer ilgili sorted
+set'te gelen eleman yoksa bu değeri ekler.
+> <b>Node.js Syntax</b>
+> ````javascript
+> const update_GT_element = {
+>     "score": 2050,
+>     "value": "Ankara"
+> }
+> 
+> const zAddWithGtFlagUpdateElement = await client.zAdd('cities', update_GT_element, {GT: true});
+> console.log(`GT FLAGI calistirildi. => ${zAddWithGtFlagUpdateElement}`);
+> 
+> const add_GT_element = {
+>     "score": 35,
+>     "value": "Izmir" 
+> }
+> 
+> const zAddWithGtFlagAddElement = await client.zAdd('cities', add_GT_element, {GT: true});
+> console.log(`GT FLAGI calistirildi. => ${zAddWithGtFlagAddElement}`);
+> ````
+> <b>Redis Syntax</b>
+> ````redis
+> zadd cities GT 140 "Ankara"
+> ````
+
+* <b><ins>`CH:`</ins></b> Redis'in ZADD komutunda CH (changed - değişen) bayrağı, komutun dönüş
+ değerinin davranışını değiştirir. Normalde ZADD komutunun dönüş değeri, sıralı sete eklenen yeni elemanların sayısını verir. Ancak CH bayrağı eklenirse, dönüş değeri yalnızca yeni eklenen elemanların sayısını değil, aynı zamanda puanı güncellenen mevcut elemanların sayısını da içerecek şekilde genişletilir.
+
+ <hr>
+
+### ZRANGE METHODU
+* Belirli bir <key>'de saklanan sıralı setteki belirtilen aralıktaki elemanları döndürür.
+* ZRANGE, farklı türde aralık sorguları gerçekleştirebilir: indekse (sıralama) göre, puana göre veya alfabetik sıraya göre.
+* ZRANGE methodu normal defaultta score puanlarına göre sıralı getirir. Aynı puana sahip olan değerler
+alfabetik sıraya göre düzelir.
+* Opsiyonel <b><i>REV</i></b> argümanı, sıralamayı tersine çevirir; böylece elemanlar en yüksek 
+puandan en düşük puana doğru sıralanır ve aynı puana sahip elemanlar arasındaki bağlar ters alfabetik 
+sıralama ile çözülür.
+* Opsiyonel <b><i>LIMIT</i></b> argümanı, eşleşen elemanlardan bir alt aralık elde etmek için kullanılabilir (SQL'deki SELECT LIMIT offset, count'a benzer).
+* Opsiyonel <b><i>WITHSCORES</i></b> argümanı, komutun yanıtına döndürülen elemanların puanlarını ekler.
+
+<u><b>ZRANGE METHODU ARGUMANLARI KULLANIMI</b></u>
+* <b><ins>`REV ARGUMANI:`</ins></b>
+> <b>Node.js Syntax</b>
+> ````javascript
+> // Asagidaki json'un Redis'te 'ProgrammingLanguages' adlı bir key'de tutulduğunu düşünelim.
+> const programmingLanguages = [
+>    {
+>        "score": 200,
+>        "value": "Javascript"
+>    },
+>    {
+>        "score": 250,
+>        "value": "Java"
+>    },
+>    {
+>        "score": 100,
+>        "value": "CSharp"
+>    },
+>    {
+>        "score": 120,
+>        "value": "PHP"
+>    }
+> ];
+> const keyName = 'ProgrammingLanguages';
+> const zRangeMethod = await client.zRange(keyName, 0, -1);
+> zRangeMethod.forEach(item => console.log(`${item}`));
+> ````
+>
+> <b>Redis Syntax</b>
+> ````redis
+> range ProgrammingLanguages 0 -1
+> ````
+
+* <b><ins>`LIMIT ARGUMANI:`</ins></b> Eşleşen elemanlardan bir alt aralık elde etmek için kullanışlıdır. Özellikle büyük veri setleriyle çalışırken, belirli bir aralıktaki elemanları sorgularken kullanışlıdır.  Örneğin, bir oyuncu lider tablosunu temsil eden bir sıralı setiniz olduğunu varsayalım ve bu lider tablosunda en iyi 10 oyuncuyu göstermek istediğimizde bu durumda, ZRANGE komutunu LIMIT argümanı ile kullanılabilir.
+
+> <b>Node.js Syntax</b>
+> ````javascript
+> /**
+> NOT: 0 - x değerini görmek istersek ZRANGE key 0 9 withsocre dememiz yeterli.
+> Withscore: Değerleri score'ları ile birlikte getirir.
+> Ama mesela X - Y aralığını görmek istiyorsak bu sefer LIMIT argumanını > 
+> kullanırız. LIMIT 2 tane deger alır. Birisi Offset, digeri Count. Offset degeri
+> baslangic noktasını temsil eder. Count degeri ise baslangictan sonra kac tane  > eleman geleceğini temsil eder.
+> */
+>
+> ````
+> <b>Redis Syntax</b>
+> ````redis
+> ZRANGEBYSCORE ProgrammingLanguages -inf +inf  withscores limit 10 3
+> ````
+
+<hr>
+
+## BITMAPS
+* Bitmap Redis içerisinde reel bir data type değildir. Temel olarak BitMap bir String'dir.
+* Bir Bitmap'i String üzerinde bit işlemleri yapan bir set olarak da
+düşünebiliriz. 
+* Bitmap'ler ayrıca <i>Bit Array</i> ve <i>Bitset</i> olarak da bilinir.
+*  Redis dokümantasyonu, Bitmap indekslerine offsetler olarak atıfta bulunur. Her bir Bitmap indeksinin ne anlama geldiği uygulama alanı tarafından belirlenir. Bitmap'ler hafıza açısından verimli olup, hızlı veri aramalarını destekler ve 2^32 bit'e kadar (4 milyardan fazla bit) saklayabilir. 
+
+### BIT OPERATIONS
+Bit işlemleri, bir biti 1 veya 0 olarak ayarlama veya değerini alma gibi sabit zamanlı tekil bit işlemleri ve örneğin belirli bir bit aralığında ayarlanmış bit sayısını sayma (örneğin, popülasyon sayımı) gibi bit grupları üzerinde yapılan işlemler olmak üzere iki gruba ayrılır.
+
+Bitmap'lerin en büyük avantajlarından biri, bilgi depolarken sıklıkla aşırı yer tasarrufu sağlamalarıdır. Örneğin, farklı kullanıcıların artan kullanıcı ID'leri ile temsil edildiği bir sistemde, 4 milyar kullanıcının tekil bir bit bilgisini (örneğin, bir kullanıcının haber bülteni almak isteyip istemediğini bilmek) yalnızca 512 MB bellek kullanarak hatırlamak mümkündür.
+
+<b><u><i>SETBIT</i></u></b>, ilk argüman olarak bit numarasını ve ikinci argüman olarak bitin ayarlanacağı değeri alır; bu değer 1 veya 0'dır. Komut, adreslenen bit mevcut string uzunluğunun dışındaysa string'i otomatik olarak genişletir.
+
+<b><u><i>GETBIT</i></u></b>, belirtilen indeksteki bitin değerini döndürür. Aralık dışı bitler (hedef anahtar içinde saklanan string'in uzunluğunun dışında bir biti adresleme) her zaman sıfır olarak kabul edilir.
+
+Bit grupları üzerinde işlem yapan üç komut vardır:
+
+* <b><i>BITOP</i></b>, farklı string'ler arasında bit düzeyinde işlemler gerçekleştirir. Sağlanan işlemler AND, OR, XOR ve NOT'tur.
+* <b><i>BITCOUNT</i></b>, 1 olarak ayarlanmış bitlerin sayısını raporlayarak popülasyon sayımı gerçekleştirir.
+* <b><i>BITPOS</i></b>, belirtilen 0 veya 1 değerine sahip ilk biti bulur.
+
+Hem BITPOS hem de BITCOUNT, string'in tüm uzunluğu için çalışmak yerine, string'in bayt aralıkları ile işlem yapabilir. Bir bitmap'de ayarlanmış bitlerin sayısını basitçe görebiliriz.
