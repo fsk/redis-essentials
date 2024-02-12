@@ -915,10 +915,11 @@ sıralama ile çözülür.
 
 ## BITMAPS
 * Bitmap Redis içerisinde reel bir data type değildir. Temel olarak BitMap bir String'dir.
-* Bir Bitmap'i String üzerinde bit işlemleri yapan bir set olarak da
-düşünebiliriz. 
-* Bitmap'ler ayrıca <i>Bit Array</i> ve <i>Bitset</i> olarak da bilinir.
-*  Redis dokümantasyonu, Bitmap indekslerine offsetler olarak atıfta bulunur. Her bir Bitmap indeksinin ne anlama geldiği uygulama alanı tarafından belirlenir. Bitmap'ler hafıza açısından verimli olup, hızlı veri aramalarını destekler ve 2^32 bit'e kadar (4 milyardan fazla bit) saklayabilir. 
+* Bir BitMap her bir bit'in 0 veya 1 depolayabildiği bir bit dizisidir. Yani bundan dolayı bir BitMap'i 
+0'lar ve 1'lerden oluşan bir Array olarak düşünebilirsiniz.
+* Bir Bitmap'i String üzerinde bit işlemleri yapan bir set olarak da düşünebiliriz. 
+* Bitmap'ler ayrıca <i>BitArray</i> ve <i>Bitset</i> olarak da bilinir.
+* Redis dokümantasyonu, Bitmap indekslerine offsetler olarak atıfta bulunur. Her bir Bitmap indeksinin ne anlama geldiği uygulama alanı tarafından belirlenir. Bitmap'ler hafıza açısından verimli olup, hızlı veri aramalarını destekler ve 2^32 bit'e kadar (4 milyardan fazla bit) saklayabilir. 
 
 ### BIT OPERATIONS
 Bit işlemleri, bir biti 1 veya 0 olarak ayarlama veya değerini alma gibi sabit zamanlı tekil bit işlemleri ve örneğin belirli bir bit aralığında ayarlanmış bit sayısını sayma (örneğin, popülasyon sayımı) gibi bit grupları üzerinde yapılan işlemler olmak üzere iki gruba ayrılır.
@@ -926,13 +927,110 @@ Bit işlemleri, bir biti 1 veya 0 olarak ayarlama veya değerini alma gibi sabit
 Bitmap'lerin en büyük avantajlarından biri, bilgi depolarken sıklıkla aşırı yer tasarrufu sağlamalarıdır. Örneğin, farklı kullanıcıların artan kullanıcı ID'leri ile temsil edildiği bir sistemde, 4 milyar kullanıcının tekil bir bit bilgisini (örneğin, bir kullanıcının haber bülteni almak isteyip istemediğini bilmek) yalnızca 512 MB bellek kullanarak hatırlamak mümkündür.
 
 <b><u><i>SETBIT</i></u></b>, ilk argüman olarak bit numarasını ve ikinci argüman olarak bitin ayarlanacağı değeri alır; bu değer 1 veya 0'dır. Komut, adreslenen bit mevcut string uzunluğunun dışındaysa string'i otomatik olarak genişletir.
+Örneğin bir kullanıcının bir uygulamayı belirli bir günde kullanıp kullanmadğını temsil eder.
+Redis'teki SETBIT komutu, belirli bir key'de saklanan string değerindeki belirli bir offset değerindeki biti ayarlar veya temizler. Bitin değeri value parametresine bağlı olarak 0 veya 1 olarak ayarlanır. Eğer belirtilen key mevcut değilse, yeni bir string değeri oluşturulur ve bu string, offset'teki bir biti barındırabilecek şekilde genişletilir. Offset argümanının 0 veya daha büyük ve 2^32'den küçük olması gerekmektedir; bu da Bitmap'lerin en fazla 512MB olabileceğini belirler. Key'in altındaki string genişletildiğinde, eklenen bitler 0 olarak ayarlanır.
+<br>
+><b>Node.js Syntax</b>
+>````javascript
+> const date = new Date();
+> const day = date.getDay();
+> const month = date.getMonth() + 1;
+> const year = date.getFullYear();
+> const key = year + '-' + (month < 10 ? '0' + month : month) + '-' + (day < 10 ? '0' + day > : day);
+>const setBitOperation = await client.SETBIT(key, 10, 1);
+>console.log(`SETBIT operation ==> ${setBitOperation}`);
+>````
+><b>Redis Syntax</b>
+>````redis
+>SETBIT key:2024-02-01 17 0
+>````
+
+<br>
 
 <b><u><i>GETBIT</i></u></b>, belirtilen indeksteki bitin değerini döndürür. Aralık dışı bitler (hedef anahtar içinde saklanan string'in uzunluğunun dışında bir biti adresleme) her zaman sıfır olarak kabul edilir.
+Örneğin belirli bir durumun kontrolünün sağlanması için kullanılabilir.
+
+> <b>Node.js Syntax</b>
+> ````javascript
+>const getBitOperation = await client.GETBIT(key, 10);
+>console.log(`GETBIT operation ==> ${getBitOperation}`);
+> ````
+> <b>Redis Syntax</b>
+>````redis
+> GETBIT key:2024-02-01 17
+>````
 
 Bit grupları üzerinde işlem yapan üç komut vardır:
 
 * <b><i>BITOP</i></b>, farklı string'ler arasında bit düzeyinde işlemler gerçekleştirir. Sağlanan işlemler AND, OR, XOR ve NOT'tur.
-* <b><i>BITCOUNT</i></b>, 1 olarak ayarlanmış bitlerin sayısını raporlayarak popülasyon sayımı gerçekleştirir.
+<br>
+
+* <b><i>BITCOUNT</i></b>, 1 ile işaretlenmiş sayıları döner. Örneğin belirli bir durum ile kaç kez karşılaşıldığını anlamak için kullanılır.
+<b>Not:</b> Bir String key'in de Bitcount değeri vardır. Bu yüzden de range verilebilir.
+> <b>Node.js Syntax</b>
+> ````javascript
+> const bitCountOperation = await client.BITCOUNT(key);
+> console.log(`BITCOUNT operation ==> ${bitCountOperation}`);
+> ````
+> <b>Redis Syntax</b>
+>````redis
+> BITCOUNT mykey
+>````
+
 * <b><i>BITPOS</i></b>, belirtilen 0 veya 1 değerine sahip ilk biti bulur.
 
 Hem BITPOS hem de BITCOUNT, string'in tüm uzunluğu için çalışmak yerine, string'in bayt aralıkları ile işlem yapabilir. Bir bitmap'de ayarlanmış bitlerin sayısını basitçe görebiliriz.
+
+<hr>
+
+## HYPERLOGLOGS
+
+* HyperLogLogs Redis'te tam bir data type değildir.
+* Kavramsal olarak, bir HyperLogLog, bir Set'te var olan benzersiz elemanların sayısının çok iyi bir yaklaşımını sağlamak için rastgelelik kullanan bir algoritmadır. Daha basit bir ifadeyle büyük veri setlerinde benzersiz elemanların sayısını (kardinalite) tahmin etmek için kullanılan bir algoritmadır. 
+* HyperLogLog algoritması olasılıksaldır. Yani 100% doğruluk sağlamayı garanti etmez.
+* HyperLogLog algoritması orijinal olarak Philippe Flajolet, Éric Fusy, Olivier Gandouet ve Frédéric Meunier tarafından yazılan "HyperLogLog: Neredeyse optimal kardinalite tahmin algoritmasının analizi" adlı makalede tanımlanmıştır. HyperLogLog'lar Redis 2.8.9'da tanıtılmıştır.
+* Genellikle, benzersiz sayım yapmak için, sayımını yaptığınız kümedeki öğe sayısına orantılı bir hafıza miktarına ihtiyacınız vardır. HyperLogLog'lar bu tür problemleri harika performans, düşük hesaplama maliyeti ve az miktarda hafıza ile çözer. Ancak, HyperLogLog'ların %100 doğru olmadığını hatırlamak önemlidir. Yine de, bazı durumlarda, %99.19 yeterince iyidir. İşte HyperLogLog'ların kullanılabileceği birkaç örnek:
+
+ -> Bir web sitesini ziyaret eden benzersiz kullanıcı sayısını saymak
+ -> Belirli bir tarih veya saatte web sitenizde aranan farklı terimlerin sayısını saymak
+ -> Bir kullanıcı tarafından kullanılan farklı hashtag'lerin sayısını saymak
+ -> Bir kitapta görünen farklı kelimelerin sayısını saymak
+
+* Benzersiz öğeleri saymak genellikle, saymak istediğiniz öğe sayısına orantılı bir hafıza miktarı gerektirir, çünkü çoklu sayımlardan kaçınmak için geçmişte zaten gördüğünüz elemanları hatırlamanız gerekir. Ancak, hafızayı doğrulukla takas eden bir algoritma seti mevcuttur: Bunlar, Redis'in HyperLogLog için uygulamasında %1'den az olan bir standart hatayla tahmini bir ölçüm döndürürler. Bu algoritmanın sihri, artık sayılan öğe sayısına orantılı bir hafıza miktarı kullanmanıza gerek kalmaması ve bunun yerine sabit bir hafıza miktarı kullanabilmenizdir.
+
+* Redis'teki HyperLogLog'lar, teknik olarak farklı bir veri yapısı olsalar da, bir Redis string'i olarak kodlanır, böylece bir HyperLogLog'u serileştirmek için GET ve onu sunucuya geri serileştirmek için SET çağrılabilir.
+
+* Kavramsal olarak HyperLogLog API'si, aynı görevi yapmak için Set'leri kullanmaya benzer. Gözlemlenen her elemanı bir sete SADD ile ekler ve setin içindeki benzersiz elemanların sayısını kontrol etmek için SCARD kullanırdınız, çünkü SADD mevcut bir elemanı yeniden eklemeyecektir.
+
+* Gerçekte bir HyperLogLog'a ögeler eklemeseniz de, çünkü veri yapısı gerçek elemanları içermeyen bir durum içerir, API aynıdır:
+
+* Yeni bir eleman gördüğünüz her seferinde, onu PFADD ile sayıma eklersiniz.
+PFADD komutu kullanılarak eklenen benzersiz elemanların güncel yaklaşımını almak istediğinizde PFCOUNT komutunu kullanabilirsiniz. İki farklı HLL'yi birleştirmeniz gerekiyorsa, PFMERGE komutu mevcuttur. HLL'ler benzersiz elemanların yaklaşık sayılarını sağladığından, birleştirme sonucu her iki kaynak HLL'deki benzersiz elemanların sayısının bir yaklaşımını size verecektir.
+
+### PFADD
+* Redis'te PFADD komutu, HyperLogLog veri yapısına bir veya daha fazla eleman eklemek için kullanılır.
+* HyperLogLog, benzersiz elemanların sayısını tahmin etmekte kullanılan bir algoritmadır ve PFADD komutu bu algoritmanın temel operasyonlarından biridir. Bu komut, verilen elemanları HyperLogLog'a ekler ve bu sayede veri yapısının benzersiz eleman sayısını tahmin etme kabiliyetini günceller.
+
+* ``PFADD key element [element ...]``
+* <i>key:</i> HyperLogLog veri yapısının adıdır. Eğer bu isimde bir veri yapısı yoksa, Redis otomatik olarak yeni bir HyperLogLog oluşturur.
+* <i>element:</i> HyperLogLog'a eklenmek istenen eleman(lar). Birden fazla eleman eklemek için, elemanları aralarında boşluk bırakarak sıralayabilirsiniz.
+* Eğer belirtilen key ile ilişkilendirilmiş bir HyperLogLog yoksa, Redis otomatik olarak yeni bir HyperLogLog oluşturur ve belirtilen eleman(lar)ı ekler.
+* Eğer key zaten bir HyperLogLog'a işaret ediyorsa, Redis belirtilen eleman(lar)ı mevcut HyperLogLog'a ekler.
+* PFADD komutu, eklenen eleman(lar)ın HyperLogLog'un iç durumunu değiştirdiyse (yani en az bir eleman HyperLogLog'a daha önce eklenmemişse) 1 döner. Eğer eklenen tüm elemanlar zaten HyperLogLog'da varsa ve iç durum değişmezse 0 döner.
+* PFADD komutunun sonucu, veri yapısının iç durumunun değişip değişmediğine bağlıdır, ancak bu sonuç HyperLogLog'un tahmini benzersiz eleman sayısının ne olduğu hakkında bir bilgi vermez
+
+> <b>Node.js Syntax</b>
+>````javascript
+> const programmingLanguages = ["ElasticSearch", "Redis", "Docker", "Kubernetes"]
+> const hyperLogLog = await client.PFADD('books', > programmingLanguages);
+> console.log(`PFADD OPERATION ==> ${hyperLogLog}`);
+>````
+> <b>Redis Syntax</b>
+> `````redis
+> PFADD visits:2015-01-01 "carl" "max" "hugo" "arthur"
+>
+
+### PFCOUNT
+* PFCOUNT komutu, bir veya birden fazla anahtarı argüman olarak kabul eder. Tek bir argüman belirtildiğinde, yaklaşık kardinaliteyi döndürür. Birden fazla anahtar belirtildiğinde, tüm benzersiz elemanların birleşiminin yaklaşık kardinalitesini döndürür.
+* PFCOUNT komutu tek bir key ile çağrıldığında, belirtilen key'de saklanan HyperLogLog veri yapısının hesapladığı yaklaşık kardinaliteyi döndürür. Eğer belirtilen anahtar mevcut değilse, 0 değerini döndürür.
+* PFCOUNT komutu birden fazla keyle çağrıldığında, geçirilen HyperLogLog'ların birleşiminin yaklaşık kardinalitesini döndürür. Bu, içsel olarak belirtilen anahtarlarda saklanan HyperLogLog'ları geçici bir HyperLogLog'da birleştirerek yapılır.
