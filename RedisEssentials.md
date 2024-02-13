@@ -845,7 +845,9 @@ set'te gelen eleman yoksa bu değeri ekler.
 > ````
 
 * <b><ins>`CH:`</ins></b> Redis'in ZADD komutunda CH (changed - değişen) bayrağı, komutun dönüş
- değerinin davranışını değiştirir. Normalde ZADD komutunun dönüş değeri, sıralı sete eklenen yeni elemanların sayısını verir. Ancak CH bayrağı eklenirse, dönüş değeri yalnızca yeni eklenen elemanların sayısını değil, aynı zamanda puanı güncellenen mevcut elemanların sayısını da içerecek şekilde genişletilir.
+ değerinin davranışını değiştirir. Normalde ZADD komutunun dönüş değeri, sıralı sete eklenen yeni elemanların sayısını verir. 
+ Ancak CH bayrağı eklenirse, dönüş değeri yalnızca yeni eklenen elemanların sayısını değil, aynı zamanda puanı 
+ güncellenen mevcut elemanların sayısını da içerecek şekilde genişletilir.
 
  <hr>
 
@@ -893,7 +895,10 @@ sıralama ile çözülür.
 > range ProgrammingLanguages 0 -1
 > ````
 
-* <b><ins>`LIMIT ARGUMANI:`</ins></b> Eşleşen elemanlardan bir alt aralık elde etmek için kullanışlıdır. Özellikle büyük veri setleriyle çalışırken, belirli bir aralıktaki elemanları sorgularken kullanışlıdır.  Örneğin, bir oyuncu lider tablosunu temsil eden bir sıralı setiniz olduğunu varsayalım ve bu lider tablosunda en iyi 10 oyuncuyu göstermek istediğimizde bu durumda, ZRANGE komutunu LIMIT argümanı ile kullanılabilir.
+* <b><ins>`LIMIT ARGUMANI:`</ins></b> Eşleşen elemanlardan bir alt aralık elde etmek için kullanışlıdır. 
+Özellikle büyük veri setleriyle çalışırken, belirli bir aralıktaki elemanları sorgularken kullanışlıdır.  
+Örneğin, bir oyuncu lider tablosunu temsil eden bir sıralı setiniz olduğunu varsayalım ve bu lider tablosunda en iyi 10 oyuncuyu göstermek 
+istediğimizde bu durumda, ZRANGE komutunu LIMIT argümanı ile kullanılabilir.
 
 > <b>Node.js Syntax</b>
 > ````javascript
@@ -919,7 +924,8 @@ sıralama ile çözülür.
 0'lar ve 1'lerden oluşan bir Array olarak düşünebilirsiniz.
 * Bir Bitmap'i String üzerinde bit işlemleri yapan bir set olarak da düşünebiliriz. 
 * Bitmap'ler ayrıca <i>BitArray</i> ve <i>Bitset</i> olarak da bilinir.
-* Redis dokümantasyonu, Bitmap indekslerine offsetler olarak atıfta bulunur. Her bir Bitmap indeksinin ne anlama geldiği uygulama alanı tarafından belirlenir. Bitmap'ler hafıza açısından verimli olup, hızlı veri aramalarını destekler ve 2^32 bit'e kadar (4 milyardan fazla bit) saklayabilir. 
+* Redis dokümantasyonu, Bitmap indekslerine offsetler olarak atıfta bulunur. Her bir Bitmap indeksinin ne anlama geldiği uygulama alanı tarafından belirlenir. 
+Bitmap'ler hafıza açısından verimli olup, hızlı veri aramalarını destekler ve 2^32 bit'e kadar (4 milyardan fazla bit) saklayabilir. 
 
 ### BIT OPERATIONS
 Bit işlemleri, bir biti 1 veya 0 olarak ayarlama veya değerini alma gibi sabit zamanlı tekil bit işlemleri ve örneğin belirli bir bit aralığında ayarlanmış bit sayısını sayma (örneğin, popülasyon sayımı) gibi bit grupları üzerinde yapılan işlemler olmak üzere iki gruba ayrılır.
@@ -1048,6 +1054,12 @@ PFADD komutu kullanılarak eklenen benzersiz elemanların güncel yaklaşımın�
  -> Ay bazında ürün alımları
  -> İklim değişiklikleri
 Birçok TimeSeries sistemi, bir veri seti çok hızlı bir şekilde büyüyebileceğinden depolama konusunda zorluklarla karşı karşıyadır. Her saniye olayları depolarken, her gün en az 86.400 veri noktası oluşturulur ve uzun bir süre boyunca bu kadar çok veri noktasını depolamak, özellikle Redis gibi bellek içi veri depoları için zorludur.
+
+
+<hr>
+
+## Pub/Sub
+* 
 
 
 
