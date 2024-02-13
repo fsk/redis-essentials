@@ -1034,3 +1034,22 @@ PFADD komutu kullanılarak eklenen benzersiz elemanların güncel yaklaşımın�
 * PFCOUNT komutu, bir veya birden fazla anahtarı argüman olarak kabul eder. Tek bir argüman belirtildiğinde, yaklaşık kardinaliteyi döndürür. Birden fazla anahtar belirtildiğinde, tüm benzersiz elemanların birleşiminin yaklaşık kardinalitesini döndürür.
 * PFCOUNT komutu tek bir key ile çağrıldığında, belirtilen key'de saklanan HyperLogLog veri yapısının hesapladığı yaklaşık kardinaliteyi döndürür. Eğer belirtilen anahtar mevcut değilse, 0 değerini döndürür.
 * PFCOUNT komutu birden fazla keyle çağrıldığında, geçirilen HyperLogLog'ların birleşiminin yaklaşık kardinalitesini döndürür. Bu, içsel olarak belirtilen anahtarlarda saklanan HyperLogLog'ları geçici bir HyperLogLog'da birleştirerek yapılır.
+
+<hr>
+
+## TIMESERIES
+
+* Bir TimeSeries, zaman aralığı boyunca yapılan sıralı değerler dizisi (veri noktaları) anlamına gelir.
+* TimeSeries; istatistik, sosyal network ve iletişim mühendisliği alanlarında kullanılabilir. Ama aslında zaman ölçümü gerektiren alanlarda rahatlıkla kullanılabilir.
+* TimeSeries, gelecekteki borsa değişikliklerini, emlak trendlerini, çevresel koşulları ve daha fazlasını tahmin etmek için kullanılabilir. Zaman serilerine örnekler şunlardır:
+ -> Bir gazetede zaman içinde belirli kelimelerin veya terimlerin kullanımı
+ -> Yıl bazında asgari ücret
+ -> Hisse senedi fiyatlarında günlük değişiklikler
+ -> Ay bazında ürün alımları
+ -> İklim değişiklikleri
+Birçok TimeSeries sistemi, bir veri seti çok hızlı bir şekilde büyüyebileceğinden depolama konusunda zorluklarla karşı karşıyadır. Her saniye olayları depolarken, her gün en az 86.400 veri noktası oluşturulur ve uzun bir süre boyunca bu kadar çok veri noktasını depolamak, özellikle Redis gibi bellek içi veri depoları için zorludur.
+
+
+
+
+
