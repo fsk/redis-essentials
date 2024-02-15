@@ -30,9 +30,9 @@ function displayResults(granularityName, results) {
     console.log("Results from " + granularityName + ":");
     console.log("Timestamp \t| Value");
     console.log("--------------- | ------");
-    for (var i = 0; i < results.length; i++) {
-        console.log('\t' + results[i].timestamp + '\t| ' +
-            results[i].value);
+    for (const element of results) {
+        console.log('\t' + element.timestamp + '\t| ' +
+            element.value);
     }
     console.log();
 }
