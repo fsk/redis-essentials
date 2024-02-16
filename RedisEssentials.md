@@ -1058,10 +1058,58 @@ Birçok TimeSeries sistemi, bir veri seti çok hızlı bir şekilde büyüyebile
 
 <hr>
 
-## Pub/Sub
-* 
+## Pub/Sub
+* Pub/Sub, mesajların doğrudan belirli alıcılara gönderilmediği bir modeldir.
+* Publisher'lar, mesajları kanallara gönderir ve subscriberlar, belirli bir kanalı dinliyorlarsa bu mesajları alırlar.
+* Bir subscriber, bir publischer'a abone olduktan sonra mesajları gerçek zamanlı olarak alır.
+* Bir subscriber, bir publischer'dan mesajları, mesajların yayınlanma sırasıyla alır.
+````
+* Pub/Sub messaging için 4 temel husustan bahsedilebilir.
+    -> Messaging
+    Mesajlar göndericiden alıcıya gönderilen bir iletişim verisidir. Mesaj veri türleri basit String'lerden , sensör
+    verilerinden, seslerden, dijital içeriklerden ... yani her şeyden oluşabilir.
+    
+    -> Topic
+    Her mesajın kendisiyle ilişkili bir topic'i vardır. Topicler, göndericiler ile alıcılar arasında aracı kanal vazifesi
+    görür. İlgili konu başlığı hakkındaki mesajlarla ilgilenen alıcıların güncel bir listesini tutar.
+    
+    -> Subscriber
+    Subscriber mesajın alıcısıdır. Subscriber, ilgilendiği konu başlıklarına kaydolmak(yani abone olmak) zorundadır. Farklı
+    işlevleri yerine getirebilirler veya paralel mesaja farklı bir şey yapabilirler.
+    
+    -> Publischer
+    Publischer mesajı gönderen bileşendir. Bir topic hakkında mesajlar oluşturur ve sadece ilgili topic'in subscriber'larına
+    gönderir. Publischer ile subscriber arasındaki bu etkileşim, bire-çok ilişki olarak adlandırılır. Publischer, yayınladığı
+    bilgilerin kimlerin kullandığını, subscriber da mesajın nereden geldiğini bilmek zorunda değildir.
+    
+* Avantajları
+    -> Loosely Coupling
+    Publischer'lar Subscriber'lar ile loosely coupling bir bağa sahiptir ve onların varlığından haberdar olması bile gerekmez.
+    -> Scability
+    Pub/Sub, paralel işletim, mesaj caching, three-basef veya ağ tabanlı yönlendirme gibi yollarla, geleneksel 
+    client-server yapısına göre daha iyi ölçeklenebilirlik fırsatı sunar. Ancak, tightly-coupled, yüksek hacimli 
+    kurumsal ortamların belirli türlerinde, sistemler binlerce sunucunun pub/sub altyapısını paylaştığı veri merkezlerine 
+    ölçeklendirildikçe, mevcut satıcı sistemleri sıklıkla bu avantajı kaybeder; bu bağlamlarda yüksek yük altındaki 
+    pub/sub ürünlerinin ölçeklenebilirliği bir araştırma zorluğudur.
+* Dezavantajları: Mesaj iletim problemleri
+```` 
+<br><br>
 
+![img.png](img.png)
 
+<br><br>
 
+````
+Bir subscribe bir publischer'a SUBSCRIBE methodu ile bağlanır.
+-> SUBSCRIBE "channelName"
+Bu method var olan bir kanala bağlanır.
+
+Bir publischer ise, şu şekilde kanal oluşturup mesaj yayınlar.
+-> PUBLISH "channelName" "messageName"
+Bu method "channelName" ' e subscribe olan bütün kanallara "messageName" ' i gönderir.
+
+NOT: Ama burada bazı duurmlar var. message olmadan Publisher oluşturulamıyor. Ayrıca bir subscriber, publisher'a
+abone olduktan sonra, önceki mesajları okuyamıyor. 
+````
 
 

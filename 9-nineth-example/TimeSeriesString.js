@@ -1,4 +1,4 @@
-import { createClient } from "redis"
+import { createClient } from "redis";
 
 const client = createClient();
 
@@ -10,39 +10,47 @@ if (process.argv.length < 3) {
     process.exit(1);
 }
 
-const dataType = process.argv[2];
+const dataType = process.argv[2].toLowerCase();
+const moduleName = `./TimeSeries-${dataType}.js`;
+
+try {
+    const module = await import(moduleName);
+    const TimeSeries = module.TimeSeries;
+} catch (error) {
+    console.error(`ERROR: Could not load the module '${moduleName}'. Make sure the file exists and the path is correct.`);
+    process.exit(1);
+}
 
 await client.FLUSHALL();
 
-const timeseriesModule = await import(`./timeseries-${dataType}.js`);
+const { TimeSeries } = await import(moduleName);
 
-const item1Purchases = new timeseriesModule.TimeSeries(client, "purchases:item1");
+const item1Purchases = new TimeSeries(client, "purchases:item1");
 
 const beginTimestamp = 0;
 
-item1Purchases.insert(beginTimestamp);
-item1Purchases.insert(beginTimestamp + 1);
-item1Purchases.insert(beginTimestamp + 1);
-item1Purchases.insert(beginTimestamp + 3);
-item1Purchases.insert(beginTimestamp + 61);
+await item1Purchases.insert(beginTimestamp);
+await item1Purchases.insert(beginTimestamp + 1);
+await item1Purchases.insert(beginTimestamp + 2);
+await item1Purchases.insert(beginTimestamp + 3);
+await item1Purchases.insert(beginTimestamp + 61);
 
-function displayResults(granularityName, results) {
-    console.log("Results from " + granularityName + ":");
-    console.log("Timestamp \t| Value");
-    console.log("--------------- | ------");
-    for (const element of results) {
-        console.log('\t' + element.timestamp + '\t| ' +
-            element.value);
+async function displayResults(granularityName, beginTimestamp, endTimestamp) {
+    try {
+        const results = await item1Purchases.fetch(granularityName, beginTimestamp, endTimestamp);
+        console.log("Results from " + granularityName + ":");
+        console.log("Timestamp \t| Value");
+        console.log("--------------- | ------");
+        for (const element of results) {
+            console.log('\t' + element.timestamp + '\t| ' + element.value);
+        }
+        console.log();
+    } catch (error) {
+        console.error(`Error fetching data for granularity ${granularityName}: ${error}`);
     }
-    console.log();
 }
 
-item1Purchases.fetch("1sec", beginTimestamp, beginTimestamp + 4, displayResults);
+await displayResults("1sec", beginTimestamp, beginTimestamp + 4);
+await displayResults("1min", beginTimestamp, beginTimestamp + 120);
 
-item1Purchases.fetch("1min", beginTimestamp, beginTimestamp + 120, displayResults);
-
-
-client
-    .quit()
-    .then(r => console.log(`${r}`))
-    .catch(err => console.log(`${err}`));
+await client.quit();
