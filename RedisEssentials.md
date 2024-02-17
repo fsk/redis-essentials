@@ -1112,4 +1112,63 @@ NOT: Ama burada bazı duurmlar var. message olmadan Publisher oluşturulamıyor.
 abone olduktan sonra, önceki mesajları okuyamıyor. 
 ````
 
+* Bir pub/sub mekanizmasında subscriber modda iken aşağıdaki methodlar çalışır.
+<br>
+> <b>PING</b>
+> Hiç bir argument sağlanmazsa <i>PONG</i> değerini döndürür. Aksi halde argümanların
+> bir kopyasını kopya olarak döndürür.<br>
+> Bir bağlantının hala ayakta olup olmadığını test etmek için kullanılabilir.<br>
+> Gecikme ölçümleri için kullanılabilir.
+> 
+> ````javascript
+> const result = await client.PING(`Ayaktayim`);
+> console.log(`${result}`);
+> /**
+> * NOT: Eğer PING methodu içerisine hiç bir şey parametre olarak verilmezse
+> * PONG değerini döndürür. 
+> Eğer içerisine bir parametre verilirse onu dönderir.
+> **/
+> ````
+
+> <b>PSUBSCRIBE</b> bu komut, belirli bir pattern'e uyan kurallardan yayınlanan mesajları dinlemek için kullanılır. <br>
+> Örnek olarak
+> * h?ello; hello, hallo hxllo ' ya abone olabilir.
+> * h*llo; hllo, heeeeeello ' ya abone olabilir.
+> * h[ae]llo; hello, hallo ya abone olabilir. Ama hillo'ya abone olamaz.
+
+<hr>
+
+## TRANSACTIONS
+
+* Redis'te transaction sırasıyla ve otomatik olarak yürütülen bir dizi komuttur.
+* Bu komutları <i><u>MULTI</i></u>, <i><u>EXEC</i></u>, <i><u>DISCARD</i></u> ve <i><u>WATCH</i></u> komutları etrafında
+yürütebiliriz.
+* <b>Bir transactiondaki tüm komutlar sıralı bir şekilde seri hale getirilir ve ardışık olarak yürütülür. 
+Başka bir client tarafından gönderilen bir request, Redis Transactionunun yürütülmesinin ortasında asla işlenmez. 
+Bu, komutların tek bir izole işlem olarak yürütüldüğünü garanti eder.</b>
+* <b>EXEC komutu, transactiondaki tüm komutların yürütülmesini tetikler, bu nedenle bir client, EXEC komutunu çağırmadan önce 
+transaction bağlamında sunucuya olan bağlantısını kaybederse, hiçbir operasyon gerçekleştirilmez. Ancak EXEC komutu 
+çağrılırsa, tüm transactionlar gerçekleştirilir. Sadece ekleme modunda dosya kullanırken, Redis transactionu
+diske yazmak için tek bir write(2) sistem çağrısını kullanmaya dikkat eder. Ancak, Redis sunucusu çökerse veya 
+sistem yöneticisi tarafından bazı sert yöntemlerle kapatılırsa, yalnızca kısmi sayıda operasyonun kaydedildiği mümkündür.
+Redis bu durumu yeniden başlatıldığında algılayacak ve bir hata ile çıkış yapacaktır. Redis-check-aof aracını kullanarak, 
+yalnızca ekleme modundaki dosyayı düzeltebilir ve kısmi transactionu kaldırabilir, böylece sunucu tekrar başlayabilir.</b>
+
+> MULTI komutu kullanılarak bir Redis Trransaction'u girilir. Komut her zaman OK ile yanıt verir. 
+> Bu noktada kullanıcı birden fazla komut verebilir. Redis bu komutları yürütmek yerine bunları sıraya koyacaktır. 
+> EXEC çağrıldığında tüm komutlar yürütülür.
+> Bunun yerine DISCARD çağrılırsa transaction kuyruğu temizlenir ve transactiondan çıkılır.
+> 
+> ````redis
+> MULTI
+> INCR foo
+> INCR bar
+> EXEC
+> ````
+> Yukarıdaki işlemler Redis syntaxı ile bir transaction kuyruğunun oluşturulması ve çalıştırılması adımlarıdır.<br>
+> 1) Önce <i>MULTI</i> komutu ile transaction başlatılır.
+> 2) Sonra bir tane komut eklenir. (NOT: Girilen her command QUEUED dizisiyle yanıt verir.)
+> 3) Sonra bir tane daha komut eklenir.
+> 4) En sonunda <i>EXEC<i/> komutuyla transaction çalıştırılır.
+> 
 
