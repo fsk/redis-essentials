@@ -1169,6 +1169,44 @@ yalnızca ekleme modundaki dosyayı düzeltebilir ve kısmi transactionu kaldır
 > 1) Önce <i>MULTI</i> komutu ile transaction başlatılır.
 > 2) Sonra bir tane komut eklenir. (NOT: Girilen her command QUEUED dizisiyle yanıt verir.)
 > 3) Sonra bir tane daha komut eklenir.
-> 4) En sonunda <i>EXEC<i/> komutuyla transaction çalıştırılır.
+> 4) En sonunda <i>EXEC</i> komutuyla transaction çalıştırılır.
 > 
+> <b>Node.js</b> syntaxı ile ise aşağıdaki şekildeki gibi bir transaction çalıştırılabilir.
+> ````javascript
+> const result = await client
+>    .multi()
+>    .hSet("movie", {title: "The Godfather", star: 5})
+>    .hSet("movie", {title: "Shawshank Redemption", star: 5})
+>    .mSet("java community", "Turkiye Java Community", "AWS Community", "ServerlessTR")
+>    .incr("count")
+>    .exec();
+> ````
+> 
+
+### ERRORS
+* Bir transaction yürütülürken 2 farklı Command hatası ile karşılaşmak mümkündür.<br>
+<b>-></b> Bir komut sıraya alınmada başarısız olabilir, bu nedenle EXEC çağrılırken bir hata olabilir. 
+Örneğin, komut sözdizimsel olarak yanlış olabilir (yanlış argüman sayısı, yanlış komut adı, vb.), veya maxmemory 
+yönergesi kullanılarak sunucunun bir bellek limitine sahip olacak şekilde yapılandırılmışsa, bellek yetersizliği 
+gibi kritik bir durum olabilir.<br>
+<b>-></b> EXEC çağrıldıktan sonra bir komut başarısız olabilir, örneğin bir key'e yanlış bir değerle 
+(bir String değerine karşı bir liste işlemi çağırma gibi) bir işlem gerçekleştirdiğimiz için.
+* Redis 2.6.5'ten itibaren sunucu, komutların toplanması sırasında bir hata algılayacaktır. 
+Daha sonra EXEC sırasında hata veren operasyonu yürütmeyi reddederek transactionu iptal eder.
+* EXEC'den sonra meydana gelen hatalar özel bir şekilde ele alınmaz: transaction sırasında bazı komutlar başarısız olsa 
+bile diğer tüm komutlar yürütülür.
+* Bir komut başarısız olsa bile kuyruktaki diğer tüm komutların işlendiğini unutmamak önemlidir; Redis, komutların işlenmesini durdurmaz.
+
+### ROLLBACKS
+* Rollback işlemlerinin desteklenmesi, Redis'in basitliği ve performansı üzerinde önemli bir etkiye sahip olacağından 
+Redis, transactionların rollback olmasını desteklemez.
+* <i>DISCARD</i> bir transactionu iptal etmek için kullanılabilir. Bu durumda hiçbir komut yürütülmez ve 
+bağlantının durumu normale döndürülür
+
+### WATCH
+* Redis Dokümantasyonunda Optimistic-Locking Using Check-And-Set diye bir kavram vardır.
+* WATCH, Redis transactionlarında bir check-and-set (CAS) davranışı sağlamak için kullanılır.
+* <i>WATCH</i>ed key'ler, onlara karşı yapılan değişiklikleri tespit etmek için izlenir. 
+EXEC komutundan önce en az bir WATCHED key değiştirilirse tüm transaction iptal edilir ve EXEC, transactionun
+başarısız olduğunu bildirmek için bir Null yanıtı döndürür.
 
