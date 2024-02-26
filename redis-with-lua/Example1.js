@@ -1,17 +1,30 @@
-import { createClient } from "redis";
+import {createClient} from "redis";
 
 const client = createClient();
 
 await client.connect();
 
-await client.set('programmingLanguage', 'Java');
+const presidents = [
+    {
+        "score": 1732,
+        "value": "George Washington"
+    },
+    {
+        "score": 1809,
+        "value": "Abraham Lincoln"
+    },
+    {
+        "score": 1858,
+        "value": "Theodore Roosevelt"
+    }
+]
 
-const luaScript = 'return redis.call("GET", KEYS[1])';
+await client.zAdd("americanPresidents", presidents);
 
-try {
-    // Redis anahtarının ismi string olarak geçirilmeli
-    const result = await client.eval(luaScript, 1, 'programmingLanguage');
-    console.log(result); // 'Java' değerini yazdırmalı
-} catch (err) {
-    console.error('Bir hata oluştu:', err);
-}
+const luaScript = [
+    'local elements = redis.call("ZRANGE", "KEYS[1]", 0, 0)',
+    'redis.call("ZREM", "KEYS[1]", elements[1])',
+    'return elements[1]'
+].join('\n');
+
+await client.eval(luaScript, 1, "americanPresidents");
