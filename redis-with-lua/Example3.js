@@ -5,15 +5,18 @@ const client = createClient();
 
 await client.connect();
 
-const luaScript = await readFile('/Users/fsk/Desktop/coding/redis-essentials/redis-with-lua/Script1.lua');
+const path1 = "/Users/fsk/Desktop/coding/redis-essentials/redis-with-lua/Script1.lua";
+const path2 = "/Users/fsk/Desktop/coding/redis-essentials/redis-with-lua/LuaScript2.lua";
+const luaScript = await readFile(path1);
 const result = await client.eval(luaScript, "0");
 console.log(`Result ==> ${result}`);
 const key = "americanPresidents";
-const luaScript2 = await readFile('/Users/fsk/Desktop/coding/redis-essentials/redis-with-lua/LuaScript2.lua');
-const result2 = await client.eval(luaScript2, 1, "americanPresidents");
+const luaScript2 = await readFile(path2);
+const result2 = await client.eval(luaScript2, 1, `${key}`);
 
-
-console.log(`Lua Script From Text ==> ${result2}`)
+result2.forEach(item => {
+    console.log(item)
+})
 
 
 

@@ -1,2 +1,2 @@
-local result = redis.call('zrange', 'americanPresidents', 0, -1);
+local result = redis.call('ZRANGE', 'americanPresidents', 0, -1, 'WITHSCORES');
 return result
