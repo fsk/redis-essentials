@@ -1,0 +1,32 @@
+### Deneme
+GET http://localhost:3550/deneme
+Accept: application/json
+
+### Create Lesson
+POST http://localhost:3550/lessons
+Content-Type: application/json
+
+{
+  "lessonName": "Physic",
+  "capacity": 150,
+  "startTime": "10.30"
+}
+
+### Get Lesson By Id
+GET http://localhost:3550/lessons/getById/abcde
+Accept: application/json
+
+### Add to TTL
+POST http://localhost:3550/lessons
+Content-Type: application/json
+
+{
+  "lessonId": "lesson:01HQQVVFQGC3VAPF4W4V95NBKS",
+  "ttlTime": 60
+}
+
+### Get All
+GET http://localhost:3550/lessons/getAll
+Accept: application/json
+
+
