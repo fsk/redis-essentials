@@ -1,4 +1,4 @@
-import {Repository} from "redis-om";
+import {EntityId, Repository} from "redis-om";
 import {lessonSchema} from "../RedisEntities/Lesson.js";
 import redisClient from "../connection/RedisClient.js";
 
@@ -20,9 +20,15 @@ class LessonRepository {
         return entityId;
     }
 
-    async get(lessonId) {
+    async fetch(lessonId) {
         await this.connect();
         const lesson = await this.lessonRepository.fetch(lessonId);
+        return lesson;
+    }
+
+    async get(lessonEntityId) {
+        await this.connect();
+        const lesson = await this.lessonRepository.fetch(lessonEntityId);
         return lesson;
     }
 

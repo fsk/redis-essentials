@@ -46,7 +46,11 @@ let album = {
 album = await albumRepository.save(album)
 const result = album[EntityId];
 
-console.log(result)
+
+const res = await albumRepository.fetch(result);
+console.log("Result ==> ", res);
+
+console.log("Entity Id ==> ", result)
 
 
 await redis.quit()
