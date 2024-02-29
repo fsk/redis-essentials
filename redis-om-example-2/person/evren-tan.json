@@ -1,0 +1,34 @@
+{
+  "firstName": "Evren",
+  "lastName": "Tan",
+  "age": 40,
+  "verified": true,
+  "location": {
+    "longitude": -88.273,
+    "latitude": 40.115
+  },
+  "locationUpdated" : "2022-01-01T12:00:00.000Z",
+  "skills": [
+    ".net",
+    ".net core",
+    "AWS",
+    "Azure",
+    "Kubernetes",
+    "Docker"
+  ],
+  "personalStatement": "Continuous Improvement",
+  "companies": [
+    "Vestel",
+    "Innoca",
+    "Etiya",
+    "JotForm",
+    "Property Finder"
+  ],
+  "experience": 12,
+  "hobbies": [
+    "football",
+    "boxing",
+    "boat",
+    "reading book"
+  ]
+}

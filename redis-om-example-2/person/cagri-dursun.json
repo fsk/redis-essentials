@@ -1,0 +1,30 @@
+{
+  "firstName": "Cagri",
+  "lastName": "Dursun",
+  "age": 37,
+  "verified": true,
+  "location": {
+    "longitude": -75.273,
+    "latitude": 40.003
+  },
+  "locationUpdated" : "2022-01-01T12:00:00.000Z",
+  "skills": [
+    "Kotlin",
+    "Java",
+    "Docker",
+    "Kubernetes",
+    "Spring Boot"
+  ],
+  "personalStatement": "FolksDev Community Lead",
+  "companies": [
+    "Netas",
+    "Ikea"
+  ],
+  "experience": 12,
+  "hobbies": [
+    "football",
+    "boxing",
+    "boat",
+    "reading book"
+  ]
+}

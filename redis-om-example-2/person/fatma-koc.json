@@ -1,0 +1,30 @@
+{
+  "firstName": "Fatma",
+  "lastName": "Koç",
+  "age": 32,
+  "verified": true,
+  "location": {
+    "longitude": 27.0923,
+    "latitude": 38.4615
+  },
+  "locationUpdated": "2023-07-29T12:40:00.000Z",
+  "skills": [
+    "SEO",
+    "Content Marketing",
+    "Google Analytics",
+    "WordPress",
+    "Social Media Management"
+  ],
+  "personalStatement": "Digital Marketing Specialist with a passion for SEO and content creation",
+  "companies": [
+    "Markafoni",
+    "N11"
+  ],
+  "experience": 9,
+  "hobbies": [
+    "blogging",
+    "traveling",
+    "photography",
+    "cooking"
+  ]
+}

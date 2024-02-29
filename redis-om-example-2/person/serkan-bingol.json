@@ -1,0 +1,32 @@
+{
+  "firstName": "Serkan",
+  "lastName": "Bingol",
+  "age": 40,
+  "verified": true,
+  "location": {
+    "longitude": -118.25,
+    "latitude": 34.050
+  },
+  "locationUpdated" : "2022-01-01T12:00:00.000Z",
+  "skills": [
+    ".net",
+    ".net core",
+    "AWS",
+    "Azure",
+    "Kubernetes",
+    "Docker"
+  ],
+  "personalStatement": "AWS Community Builder",
+  "companies": [
+    "Bilge Adam",
+    "Kloia",
+    "Wope",
+    "Cmit"
+  ],
+  "experience": 12,
+  "hobbies": [
+    "lego",
+    "watch film",
+    "lego"
+  ]
+}

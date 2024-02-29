@@ -1,0 +1,30 @@
+{
+  "firstName": "Zeynep",
+  "lastName": "Çelik",
+  "age": 40,
+  "verified": true,
+  "location": {
+    "longitude": 29.0190,
+    "latitude": 40.5646
+  },
+  "locationUpdated": "2022-11-05T18:00:00.000Z",
+  "skills": [
+    "Project Management",
+    "Agile Scrum",
+    "JIRA",
+    "Confluence",
+    "Team Leadership"
+  ],
+  "personalStatement": "Experienced Project Manager and Agile Coach",
+  "companies": [
+    "Turkcell",
+    "Anadolu Sigorta"
+  ],
+  "experience": 18,
+  "hobbies": [
+    "gardening",
+    "pottery",
+    "bird watching",
+    "photography"
+  ]
+}

@@ -1,0 +1,40 @@
+{
+  "firstName": "Furkan",
+  "lastName": "Kulaksiz",
+  "age": 30,
+  "verified": false,
+  "location": {
+    "longitude": -95.689,
+    "latitude": 39.056
+  },
+  "locationUpdated" : "2022-01-01T12:00:00.000Z",
+  "skills": [
+    "Java",
+    "Javascript",
+    "Spring Boot",
+    "Node.js",
+    "Docker",
+    "Redis",
+    "MongoDb",
+    "PostgreSql"
+  ],
+  "personalStatement": "Her Sey cok guzel olacak.",
+  "companies": [
+    "Keydata",
+    "VBT",
+    "Vektorel Academy",
+    "Funds Axis",
+    "Etiya",
+    "BeeMe",
+    "CmIt"
+  ],
+  "experience": 5,
+  "hobbies": [
+    "football",
+    "chess",
+    "lego",
+    "reading book",
+    "tracking",
+    "watch film"
+  ]
+}

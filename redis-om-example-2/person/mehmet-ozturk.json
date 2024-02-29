@@ -1,0 +1,30 @@
+{
+  "firstName": "Mehmet",
+  "lastName": "Öztürk",
+  "age": 42,
+  "verified": true,
+  "location": {
+    "longitude": 29.0469,
+    "latitude": 41.0435
+  },
+  "locationUpdated": "2022-09-11T14:00:00.000Z",
+  "skills": [
+    "Swift",
+    "iOS Development",
+    "React Native",
+    "UI/UX Design",
+    "Figma"
+  ],
+  "personalStatement": "Innovative iOS Developer and Designer",
+  "companies": [
+    "Apple",
+    "Startup Studio"
+  ],
+  "experience": 15,
+  "hobbies": [
+    "sketching",
+    "yoga",
+    "surfing",
+    "traveling"
+  ]
+}

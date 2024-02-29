@@ -1,0 +1,30 @@
+{
+  "firstName": "Emre",
+  "lastName": "Yılmaz",
+  "age": 29,
+  "verified": true,
+  "location": {
+    "longitude": 28.9784,
+    "latitude": 41.0082
+  },
+  "locationUpdated": "2023-02-15T10:00:00.000Z",
+  "skills": [
+    "Python",
+    "React",
+    "Node.js",
+    "MongoDB",
+    "AWS"
+  ],
+  "personalStatement": "Tech Enthusiast and Developer",
+  "companies": [
+    "SoftTech",
+    "Trendyol"
+  ],
+  "experience": 7,
+  "hobbies": [
+    "cycling",
+    "hiking",
+    "photography",
+    "traveling"
+  ]
+}

@@ -1,0 +1,30 @@
+{
+  "firstName": "Selin",
+  "lastName": "Özdemir",
+  "age": 27,
+  "verified": true,
+  "location": {
+    "longitude": 34.8702,
+    "latitude": 39.6503
+  },
+  "locationUpdated": "2023-06-17T20:30:00.000Z",
+  "skills": [
+    "UI Design",
+    "UX Research",
+    "Sketch",
+    "Adobe XD",
+    "InVision"
+  ],
+  "personalStatement": "UI/UX Designer dedicated to creating intuitive and delightful user experiences",
+  "companies": [
+    "Logo Yazılım",
+    "Pegasus Airlines"
+  ],
+  "experience": 5,
+  "hobbies": [
+    "web design",
+    "photography",
+    "traveling",
+    "yoga"
+  ]
+}

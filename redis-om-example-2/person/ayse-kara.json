@@ -1,0 +1,30 @@
+{
+  "firstName": "Ayşe",
+  "lastName": "Kara",
+  "age": 34,
+  "verified": false,
+  "location": {
+    "longitude": 32.8543,
+    "latitude": 39.9208
+  },
+  "locationUpdated": "2023-05-20T09:30:00.000Z",
+  "skills": [
+    "SQL",
+    "C#",
+    ".NET",
+    "Azure",
+    "Angular"
+  ],
+  "personalStatement": "Software Engineer with a passion for back-end development",
+  "companies": [
+    "Hepsiburada",
+    "Microsoft"
+  ],
+  "experience": 10,
+  "hobbies": [
+    "video games",
+    "chess",
+    "reading book",
+    "cooking"
+  ]
+}

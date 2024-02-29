@@ -1,0 +1,30 @@
+{
+  "firstName": "Elif",
+  "lastName": "Demir",
+  "age": 31,
+  "verified": false,
+  "location": {
+    "longitude": 27.1428,
+    "latitude": 38.4237
+  },
+  "locationUpdated": "2023-01-25T16:20:00.000Z",
+  "skills": [
+    "HTML",
+    "CSS",
+    "JavaScript",
+    "Vue.js",
+    "Nuxt.js"
+  ],
+  "personalStatement": "Frontend Developer and JavaScript enthusiast",
+  "companies": [
+    "Vodafone",
+    "Garanti BBVA"
+  ],
+  "experience": 8,
+  "hobbies": [
+    "baking",
+    "painting",
+    "running",
+    "reading book"
+  ]
+}
