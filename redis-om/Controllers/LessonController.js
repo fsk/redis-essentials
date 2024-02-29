@@ -5,7 +5,10 @@ class LessonController {
         try {
             const lesson = req.body;
             const entityId = await LessonService.prototype.saveLesson(lesson);
-            res.status(201).send({ entityId });
+            res.status(201).send({
+                entityId,
+                "message": "Created"
+            });
         }catch (err) {
             res.status(500).send(err.message);
         }
